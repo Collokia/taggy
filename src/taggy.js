@@ -72,11 +72,13 @@ function taggy (el, options) {
   function addItem (item) {
     console.log('AddItem', item);
     // renders item, adds it to list of outputs.
+    return api;
   }
 
   function removeItem (item) {
     console.log('RemoveItem', item);
     // derenders item, removes it from list of outputs.
+    return api;
   }
 
   function createAutocomplete () {
