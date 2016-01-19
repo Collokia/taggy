@@ -9,8 +9,8 @@ void function () {
       {tagId:"dev:java", descriptionText:"java", taxonomy:"langs"},
       {tagId:"dev:jvm", descriptionText:"jvm", taxonomy:"other"}
     ],
-    parseText: d => d.descriptionText,
-    parsePlain: t => foo[t]
+    parseText: 'descriptionText',
+    free: false
   });
 
   function events (el, type, fn) {

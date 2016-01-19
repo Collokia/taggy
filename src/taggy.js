@@ -13,6 +13,7 @@ var END = 35;
 var HOME = 36;
 var LEFT = 37;
 var RIGHT = 39;
+var sinkableKeys = [END, HOME, LEFT, RIGHT];
 var tagClass = /\btay-tag\b/;
 var tagRemovalClass = /\btay-tag-remove\b/;
 var editorClass = /\btay-editor\b/g;
@@ -147,7 +148,10 @@ function taggy (el, options) {
       suggestions: o.autocomplete,
       getText,
       getValue,
-      set: addItem
+      set (s) {
+        el.value = '';
+        addItem(s);
+      }
     });
     return completer;
   }
@@ -199,7 +203,7 @@ function taggy (el, options) {
       top = top.parentElement;
       tagged = tagClass.test(top.className);
     }
-    if (tagged) {
+    if (tagged && free) {
       focusTag(top, end);
     } else if (target !== el) {
       shift();
@@ -228,26 +232,36 @@ function taggy (el, options) {
   function keydown (e) {
     var sel = selection(el);
     var key = e.which || e.keyCode || e.charCode;
-    if (key === HOME) {
-      if (before.firstChild) {
-        focusTag(before.firstChild, {});
+    if (free) {
+      if (key === HOME) {
+        if (before.firstChild) {
+          focusTag(before.firstChild, {});
+        } else {
+          selection(el, { start: 0, end: 0 });
+        }
+      } else if (key === END) {
+        if (after.lastChild) {
+          focusTag(after.lastChild, end);
+        } else {
+          selection(el, end);
+        }
+      } else if (key === LEFT && sel.start === 0 && before.lastChild) {
+        focusTag(before.lastChild, end);
+      } else if (key === BACKSPACE && sel.start === 0 && (sel.end === 0 || sel.end !== el.value.length) && before.lastChild) {
+        focusTag(before.lastChild, end);
+      } else if (key === RIGHT && sel.end === el.value.length && after.firstChild) {
+        focusTag(after.firstChild, {});
       } else {
-        selection(el, { start: 0, end: 0 });
+        return;
       }
-    } else if (key === END) {
-      if (after.lastChild) {
-        focusTag(after.lastChild, end);
-      } else {
-        selection(el, end);
-      }
-    } else if (key === LEFT && sel.start === 0 && before.lastChild) {
-      focusTag(before.lastChild, end);
-    } else if (key === BACKSPACE && sel.start === 0 && (sel.end === 0 || sel.end !== el.value.length) && before.lastChild) {
-      focusTag(before.lastChild, end);
-    } else if (key === RIGHT && sel.end === el.value.length && after.firstChild) {
-      focusTag(after.firstChild, {});
     } else {
-      return;
+      if (key === BACKSPACE && sel.start === 0 && (sel.end === 0 || sel.end !== el.value.length) && before.lastChild) {
+        before.removeChild(before.lastChild);
+      } else if (sinkableKeys.indexOf(key) !== -1) {
+        // just prevent default
+      } else {
+        return;
+      }
     }
 
     e.preventDefault();
@@ -264,14 +278,14 @@ function taggy (el, options) {
   }
 
   function paste () {
-    setTimeout(function later () { evaluate(); }, 0);
+    setTimeout(() => evaluate(), 0);
   }
 
   function evaluate (extras, entirely) {
     var p = selection(el);
     var len = entirely ? Infinity : p.start;
     var tags = el.value.slice(0, len).concat(extras || []).split(delimiter);
-    if (tags.length < 1) {
+    if (tags.length < 1 || !free) {
       return;
     }
 
