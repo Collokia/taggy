@@ -3,7 +3,6 @@
 var crossvent = require('crossvent');
 var dom = require('./dom');
 var text = require('./text');
-var slice = require('./slice');
 var selection = require('./selection');
 var autosize = require('./autosize');
 var autocomplete = require('./autocomplete');
@@ -38,6 +37,8 @@ function taggy (el, options) {
   var render = o.render || defaultRenderer;
   var readTag = o.readTag || defaultReader;
 	var convertOnFocus = o.convertOnFocus !== false;
+
+  var toItemData = defaultToItemData;
 
   var parseText = o.parseText;
   var parseValue = o.parseValue;
@@ -90,9 +91,6 @@ function taggy (el, options) {
   }
 
   function addItem (data) {
-    if (findItem(data)) {
-      return api;
-    }
     let el = renderItem(item);
     let item = { data, el, valid: true };
     currentValues.push(item);
@@ -124,11 +122,15 @@ function taggy (el, options) {
       return;
     }
     let el = dom('span', 'tay-tag');
-    render(el, getText(item));
+    render(el, item);
     if (o.deletion) {
       el.appendChild(dom('span', 'tay-tag-remove'));
     }
     buffer.appendChild(el);
+  }
+
+  function defaultToItemData (s) {
+    return s;
   }
 
   function readValue () {
@@ -270,11 +272,8 @@ function taggy (el, options) {
 
     var rest = tags.pop() + el.value.slice(len);
     var removal = tags.join(delimiter).length;
-    var i;
 
-    for (i = 0; i < tags.length; i++) {
-      createTag(before, tags[i]);
-    }
+    tags.forEach(tag => addItem(toItemData(tag)));
     cleanup();
     el.value = rest;
     p.start -= removal;
@@ -291,7 +290,7 @@ function taggy (el, options) {
     each(after, detect);
 
     function detect (value, tagElement) {
-      if (validate(value, slice(tags))) {
+      if (validate(value, tags.slice())) {
         tags.push(value);
       } else {
         tagElement.parentElement.removeChild(tagElement);
@@ -299,8 +298,8 @@ function taggy (el, options) {
     }
   }
 
-  function defaultRenderer (container, value) {
-    text(container, value);
+  function defaultRenderer (container, item) {
+    text(container, getText(item));
   }
 
   function defaultReader (tag) {
@@ -330,24 +329,12 @@ function taggy (el, options) {
   }
 
   function hasSiblings () {
-    var all = el.parentElement.children;
-    var i;
-    for (i = 0; i < all.length; i++) {
-      if (all[i] !== el && all[i].nodeType === ELEMENT) {
-        return true;
-      }
-    }
-    return false;
+    var children = el.parentElement.children;
+    return [...children].some(s => s !== el && s.nodeType === ELEMENT);
   }
 
   function each (side, fn) {
-    var children = slice(side.children);
-    var i;
-    var tag;
-    for (i = 0; i < children.length; i++) {
-      tag = children[i];
-      fn(readTag(tag), tag, i);
-    }
+    [...side.children].forEach(tag => fn(readTag(tag), tag, i));
   }
 
   function defaultValidate (value, tags) {
