@@ -43,14 +43,14 @@ function taggy (el, options) {
   var parseText = o.parseText;
   var parseValue = o.parseValue;
   var getText = (
-    typeof parseText === 'string' ? s => s[parseText] :
+    typeof parseText === 'string' ? d => d[parseText] :
     typeof parseText === 'function' ? parseText :
-    s => s
+    d => d
   );
   var getValue = (
-    typeof parseValue === 'string' ? s => s[parseValue] :
+    typeof parseValue === 'string' ? d => d[parseValue] :
     typeof parseValue === 'function' ? parseValue :
-    s => s
+    d => d
   );
 
   var before = dom('span', 'tay-tags tay-tags-before');
@@ -90,8 +90,12 @@ function taggy (el, options) {
   }
 
   function addItem (data) {
-    let item = { data, valid: true };
-    item.el = renderItem(item);
+    var item = { data, valid: true };
+    var el = renderItem(item);
+    if (!el) {
+      return api;
+    }
+    item.el = el;
     currentValues.push(item);
     return api;
   }
@@ -119,7 +123,7 @@ function taggy (el, options) {
     var {data} = item;
     var empty = typeof data === 'string' && data.trim().length === 0;
     if (empty) {
-      return;
+      return null;
     }
     let el = dom('span', 'tay-tag');
     render(el, item);
@@ -293,8 +297,10 @@ function taggy (el, options) {
     function detect (value, tagElement) {
       if (validate(value, tags.slice())) {
         tags.push(value);
-      } else {
+      } else if (o.preventDuplicates) {
         tagElement.parentElement.removeChild(tagElement);
+      } else {
+        tagElement.classList.add('tay-duplicate');
       }
     }
   }
@@ -334,8 +340,8 @@ function taggy (el, options) {
     return [...children].some(s => s !== el && s.nodeType === ELEMENT);
   }
 
-  function each (side, fn) {
-    [...side.children].forEach((tag, i) => fn(readTag(tag), tag, i));
+  function each (container, fn) {
+    [...container.children].forEach((tag, i) => fn(readTag(tag), tag, i));
   }
 
   function defaultValidate (value, tags) {
