@@ -1,12 +1,12 @@
 'use strict';
 
-var horsey = require('horsey');
 var crossvent = require('crossvent');
 var dom = require('./dom');
 var text = require('./text');
 var slice = require('./slice');
-var autosize = require('./autosize');
 var selection = require('./selection');
+var autosize = require('./autosize');
+var autocomplete = require('./autocomplete');
 var inputTag = /^input$/i;
 var ELEMENT = 1;
 var BACKSPACE = 8;
@@ -24,7 +24,7 @@ var defaultDelimiter = ' ';
 
 function find (el) {
   var entry;
-  var i;
+  let i;
   for (i = 0; i < cache.length; i++) {
     entry = cache[i];
     if (entry.el === el) {
@@ -66,10 +66,10 @@ function taggy (el, options) {
   parent.insertBefore(after, el.nextSibling);
   bind();
 
-  var auto = autosize(el);
-  var horse;
+  var shrinker = autosize(el);
+  var completer;
   if (o.autocomplete) {
-    horse = createAutocomplete();
+    completer = createAutocomplete();
   }
 
   var api = {
@@ -87,10 +87,10 @@ function taggy (el, options) {
   return api;
 
   function createAutocomplete () {
-    var horse = horsey(el, {
+    var completer = autocomplete(el, {
       suggestions: o.autocomplete
     });
-    return horse;
+    return completer;
   }
 
   function bind (remove) {
@@ -113,7 +113,7 @@ function taggy (el, options) {
     before.parentElement.removeChild(before);
     after.parentElement.removeChild(after);
     cache.splice(cache.indexOf(entry), 1);
-    auto.destroy();
+    shrinker.destroy();
     api.destroyed = true;
     api.destroy = noop(api);
     api.tags = api.value = noop(null);
@@ -235,7 +235,7 @@ function taggy (el, options) {
     p.start -= removal;
     p.end -= removal;
     if (_noselect !== true) { selection(el, p); }
-    auto.refresh();
+    shrinker.refresh();
     crossvent.fabricate(el, 'taggy-evaluated');
   }
 
@@ -294,7 +294,7 @@ function taggy (el, options) {
     el.value = p.remove ? '' : readTag(tag);
     el.focus();
     selection(el, p);
-    auto.refresh();
+    shrinker.refresh();
   }
 
   function hasSiblings () {

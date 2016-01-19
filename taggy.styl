@@ -1,5 +1,4 @@
 @import 'node_modules/nib/index'
-@import 'node_modules/horsey/horsey'
 
 .tay-editor
   padding 10px
@@ -22,3 +21,35 @@
   transition width 0.25s
   padding 3px
   margin 5px 0
+
+.tac-list
+  display none
+  position absolute
+  padding 0
+  margin 0
+  list-style-type none
+  box-shadow 1px 2px 6px
+  background-color #fff
+  color #333
+  transition left 0.1s ease-in-out
+
+.tac-show
+  display block
+
+.tac-hide
+  display none
+
+.tac-item
+  cursor pointer
+  overflow hidden
+  white-space nowrap
+  text-overflow ellipsis
+  padding 7px
+
+  &:hover
+    background-color #444
+    color #fff
+
+.tac-selected
+  background-color #333
+  color #fff

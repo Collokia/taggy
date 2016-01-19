@@ -1,41 +1,3 @@
-.sey-list {
-  display: none;
-  position: absolute;
-  padding: 0;
-  margin: 0;
-  list-style-type: none;
-  -webkit-box-shadow: 1px 2px 6px;
-  box-shadow: 1px 2px 6px;
-  background-color: #fff;
-  color: #333;
-  -webkit-transition: left 0.1s ease-in-out;
-  -moz-transition: left 0.1s ease-in-out;
-  -o-transition: left 0.1s ease-in-out;
-  -ms-transition: left 0.1s ease-in-out;
-  transition: left 0.1s ease-in-out;
-}
-.sey-show {
-  display: block;
-}
-.sey-hide {
-  display: none;
-}
-.sey-item {
-  cursor: pointer;
-  overflow: hidden;
-  white-space: nowrap;
-  -o-text-overflow: ellipsis;
-  text-overflow: ellipsis;
-  padding: 7px;
-}
-.sey-item:hover {
-  background-color: #444;
-  color: #fff;
-}
-.sey-selected {
-  background-color: #333;
-  color: #fff;
-}
 .tay-editor {
   padding: 10px;
   cursor: text;
@@ -61,4 +23,42 @@
   transition: width 0.25s;
   padding: 3px;
   margin: 5px 0;
+}
+.tac-list {
+  display: none;
+  position: absolute;
+  padding: 0;
+  margin: 0;
+  list-style-type: none;
+  -webkit-box-shadow: 1px 2px 6px;
+  box-shadow: 1px 2px 6px;
+  background-color: #fff;
+  color: #333;
+  -webkit-transition: left 0.1s ease-in-out;
+  -moz-transition: left 0.1s ease-in-out;
+  -o-transition: left 0.1s ease-in-out;
+  -ms-transition: left 0.1s ease-in-out;
+  transition: left 0.1s ease-in-out;
+}
+.tac-show {
+  display: block;
+}
+.tac-hide {
+  display: none;
+}
+.tac-item {
+  cursor: pointer;
+  overflow: hidden;
+  white-space: nowrap;
+  -o-text-overflow: ellipsis;
+  text-overflow: ellipsis;
+  padding: 7px;
+}
+.tac-item:hover {
+  background-color: #444;
+  color: #fff;
+}
+.tac-selected {
+  background-color: #333;
+  color: #fff;
 }
