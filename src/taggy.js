@@ -22,6 +22,7 @@ var end = { start: 'end', end: 'end' };
 var defaultDelimiter = ' ';
 
 function taggy (el, options) {
+  var currentValues = [];
   var _noselect = document.activeElement !== el;
   var o = options || {};
   var delimiter = o.delimiter || defaultDelimiter;
@@ -55,7 +56,8 @@ function taggy (el, options) {
   }
 
   var api = {
-    tags: readTags,
+    addItem,
+    removeItem,
     value: readValue,
     convert: convert,
     destroy: destroy
@@ -67,9 +69,34 @@ function taggy (el, options) {
 
   return api;
 
+  function addItem (item) {
+    console.log('AddItem', item);
+    // renders item, adds it to list of outputs.
+  }
+
+  function removeItem (item) {
+    console.log('RemoveItem', item);
+    // derenders item, removes it from list of outputs.
+  }
+
   function createAutocomplete () {
+    var autoText = o.parseText;
+    var autoValue = o.parseValue;
+    var getText = (
+      typeof autoText === 'string' ? s => s[autoText] :
+      typeof autoText === 'function' ? autoText :
+      s => s
+    );
+    var getValue = (
+      typeof autoValue === 'string' ? s => s[autoValue] :
+      typeof autoValue === 'function' ? autoValue :
+      s => s
+    );
     var completer = autocomplete(el, {
-      suggestions: o.autocomplete
+      suggestions: o.autocomplete,
+      getText,
+      getValue,
+      set: addItem
     });
     return completer;
   }
@@ -88,22 +115,16 @@ function taggy (el, options) {
   function destroy () {
     bind(true);
     if (horse) { horse.destroy(); }
-    el.value = readValue();
+    el.value = '';
     el.className = el.className.replace(inputClass, '');
     parent.className = parent.className.replace(editorClass, '');
     if (before.parentElement) { before.parentElement.removeChild(before); }
     if (after.parentElement) { after.parentElement.removeChild(after); }
     shrinker.destroy();
     api.destroyed = true;
-    api.destroy = noop(api);
-    api.tags = api.value = noop(null);
+    api.destroy = () => api;
+    api.tags = api.value = () => null;
     return api;
-  }
-
-  function noop (value) {
-    return function destroyed () {
-      return value;
-    };
   }
 
   function documentfocus (e) {
@@ -298,34 +319,8 @@ function taggy (el, options) {
     }
   }
 
-  function readTags () {
-    var all = [];
-    var values = el.value.split(delimiter);
-    var i;
-
-    each(before, add);
-
-    for (i = 0; i < values.length; i++) {
-      add(values[i]);
-    }
-
-    each(after, add);
-
-    return all;
-
-    function add (value) {
-      if (!value) {
-        return;
-      }
-      var tag = parse(value);
-      if (validate(tag, slice(all))) {
-        all.push(tag);
-      }
-    }
-  }
-
   function readValue () {
-    return readTags().join(delimiter);
+    return currentValues.filter(v => v.valid).map(v => v.data);
   }
 
   function defaultParse (value) {

@@ -2,7 +2,12 @@ void function () {
   'use strict';
 
   taggy(ty, {
-    autocomplete: ['foo', 'bar']
+    autocomplete: [
+      {tagId:"dev:android", descriptionText:"android", taxonomy:"devWorld"},
+      {tagId:"dev:java", descriptionText:"java", taxonomy:"langs"},
+      {tagId:"dev:jvm", descriptionText:"jvm", taxonomy:"other"}
+    ],
+    parseText: s => s.descriptionText
   });
 
   function events (el, type, fn) {

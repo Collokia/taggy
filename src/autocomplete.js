@@ -17,11 +17,8 @@ function autocomplete (el, options) {
   var o = options || {};
   var parent = o.appendTo || doc.body;
   var render = o.render || defaultRenderer;
-  var getText = o.getText || defaultGetText;
-  var getValue = o.getValue || defaultGetValue;
-  var form = o.form;
+  var {getText, getValue, form, suggestions} = o;
   var limit = typeof o.limit === 'number' ? o.limit : Infinity;
-  var suggestions = o.suggestions;
   var userFilter = o.filter || defaultFilter;
   var userSet = o.set || defaultSetter;
   var ul = tag('ul', 'tac-list');
@@ -44,30 +41,28 @@ function autocomplete (el, options) {
   }
 
   var api = {
-    add: add,
+    add,
     anchor: o.anchor,
-    clear: clear,
-    show: show,
-    hide: hide,
-    toggle: toggle,
-    destroy: destroy,
-    refreshPosition: refreshPosition,
-    appendText: appendText,
-    appendHTML: appendHTML,
-    filterAnchoredText: filterAnchoredText,
-    filterAnchoredHTML: filterAnchoredHTML,
+    clear,
+    show,
+    hide,
+    toggle,
+    destroy,
+    refreshPosition,
+    appendText,
+    appendHTML,
+    filterAnchoredText,
+    filterAnchoredHTML,
     defaultAppendText: appendText,
-    defaultFilter: defaultFilter,
-    defaultGetText: defaultGetText,
-    defaultGetValue: defaultGetValue,
-    defaultRenderer: defaultRenderer,
-    defaultSetter: defaultSetter,
-    retarget: retarget,
-    attachment: attachment,
+    defaultFilter,
+    defaultRenderer,
+    defaultSetter,
+    retarget,
+    attachment,
     list: ul,
     suggestions: []
   };
-  var entry = { el: el, api: api };
+  var entry = { el, api };
 
   retarget(el);
   parent.appendChild(ul);
@@ -410,10 +405,16 @@ function autocomplete (el, options) {
   }
 
   function defaultFilter (q, suggestion) {
-    var text = getText(suggestion) || '';
-    var value = getValue(suggestion) || '';
     var needle = q.toLowerCase();
-    return fuzzysearch(needle, text.toLowerCase()) || fuzzysearch(needle, value.toLowerCase());
+    var text = getText(suggestion) || '';
+    if (fuzzysearch(needle, text.toLowerCase())) {
+      return true;
+    }
+    var value = getValue(suggestion) || '';
+    if (typeof value !== 'string') {
+      return false;
+    }
+    return fuzzysearch(needle, value.toLowerCase());
   }
 
   function loopbackToAnchor (text, p) {
@@ -461,18 +462,6 @@ function autocomplete (el, options) {
 }
 
 function isInput (el) { return el.tagName === 'INPUT' || el.tagName === 'TEXTAREA'; }
-
-function defaultGetValue (suggestion) {
-  return defaultGet('value', suggestion);
-}
-
-function defaultGetText (suggestion) {
-  return defaultGet('text', suggestion);
-}
-
-function defaultGet (type, value) {
-  return value && value[type] !== void 0 ? value[type] : value;
-}
 
 function tag (type, className) {
   var el = doc.createElement(type);
