@@ -19,27 +19,9 @@ var tagRemovalClass = /\btay-tag-remove\b/;
 var editorClass = /\btay-editor\b/g;
 var inputClass = /\btay-input\b/g;
 var end = { start: 'end', end: 'end' };
-var cache = [];
 var defaultDelimiter = ' ';
 
-function find (el) {
-  var entry;
-  let i;
-  for (i = 0; i < cache.length; i++) {
-    entry = cache[i];
-    if (entry.el === el) {
-      return entry.api;
-    }
-  }
-  return null;
-}
-
 function taggy (el, options) {
-  var cached = find(el);
-  if (cached) {
-    return cached;
-  }
-
   var _noselect = document.activeElement !== el;
   var o = options || {};
   var delimiter = o.delimiter || defaultDelimiter;
@@ -81,7 +63,6 @@ function taggy (el, options) {
   var entry = { el: el, api: api };
 
   evaluate([delimiter], true);
-  cache.push(entry);
   _noselect = false;
 
   return api;
@@ -110,9 +91,8 @@ function taggy (el, options) {
     el.value = readValue();
     el.className = el.className.replace(inputClass, '');
     parent.className = parent.className.replace(editorClass, '');
-    before.parentElement.removeChild(before);
-    after.parentElement.removeChild(after);
-    cache.splice(cache.indexOf(entry), 1);
+    if (before.parentElement) { before.parentElement.removeChild(before); }
+    if (after.parentElement) { after.parentElement.removeChild(after); }
     shrinker.destroy();
     api.destroyed = true;
     api.destroy = noop(api);

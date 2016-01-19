@@ -10,28 +10,10 @@ var KEY_ESC = 27;
 var KEY_UP = 38;
 var KEY_DOWN = 40;
 var KEY_TAB = 9;
-var cache = [];
 var doc = document;
 var docElement = doc.documentElement;
 
-function find (el) {
-  var entry;
-  var i;
-  for (i = 0; i < cache.length; i++) {
-    entry = cache[i];
-    if (entry.el === el) {
-      return entry.api;
-    }
-  }
-  return null;
-}
-
 function autocomplete (el, options) {
-  var cached = find(el);
-  if (cached) {
-    return cached;
-  }
-
   var o = options || {};
   var parent = o.appendTo || doc.body;
   var render = o.render || defaultRenderer;
@@ -88,7 +70,6 @@ function autocomplete (el, options) {
   var entry = { el: el, api: api };
 
   retarget(el);
-  cache.push(entry);
   parent.appendChild(ul);
   el.setAttribute('autocomplete', 'off');
 
@@ -414,7 +395,6 @@ function autocomplete (el, options) {
   function destroy () {
     inputEvents(true);
     if (parent.contains(ul)) { parent.removeChild(ul); }
-    cache.splice(cache.indexOf(entry), 1);
   }
 
   function defaultSetter (value) {
