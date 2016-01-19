@@ -33,12 +33,24 @@ function taggy (el, options) {
   if (any || !inputTag.test(el.tagName)) {
     throw new Error('taggy expected an input element without any siblings');
   }
-  var parse = o.parse || defaultParse;
   var free = o.free !== false;
   var validate = o.validate || defaultValidate;
   var render = o.render || defaultRenderer;
   var readTag = o.readTag || defaultReader;
 	var convertOnFocus = o.convertOnFocus !== false;
+
+  var parseText = o.parseText;
+  var parseValue = o.parseValue;
+  var getText = (
+    typeof parseText === 'string' ? s => s[parseText] :
+    typeof parseText === 'function' ? parseText :
+    s => s
+  );
+  var getValue = (
+    typeof parseValue === 'string' ? s => s[parseValue] :
+    typeof parseValue === 'function' ? parseValue :
+    s => s
+  );
 
   var before = dom('span', 'tay-tags tay-tags-before');
   var after = dom('span', 'tay-tags tay-tags-after');
@@ -59,41 +71,72 @@ function taggy (el, options) {
     addItem,
     removeItem,
     value: readValue,
-    convert: convert,
-    destroy: destroy
+    convert,
+    destroy
   };
-  var entry = { el: el, api: api };
+  var entry = { el, api };
 
   evaluate([delimiter], true);
   _noselect = false;
 
   return api;
 
-  function addItem (item) {
-    console.log('AddItem', item);
-    // renders item, adds it to list of outputs.
+  function findItem (data) {
+    for (let i = 0; i < currentValues.length; i++) {
+      if (currentValues[i].data === data) {
+        return currentValues[i];
+      }
+    }
+    return null;
+  }
+
+  function addItem (data) {
+    if (findItem(data)) {
+      return api;
+    }
+    let el = renderItem(item);
+    let item = { data, el, valid: true };
+    currentValues.push(item);
     return api;
   }
 
-  function removeItem (item) {
-    console.log('RemoveItem', item);
-    // derenders item, removes it from list of outputs.
+  function removeItem (data) {
+    var item = findItem(data);
+    if (item) {
+      removeItemElement(item.el);
+      currentValues.splice(currentValues.indexOf(item), 1);
+    }
     return api;
+  }
+
+  function renderItem (item) {
+    createTag(before, item);
+  }
+
+  function removeItemElement (el) {
+    if (el.parentElement) {
+      el.parentElement.removeChild(el);
+    }
+  }
+
+  function createTag (buffer, item) {
+    var empty = typeof item === 'string' && item.trim().length === 0;
+    if (empty) {
+      return;
+    }
+    let el = dom('span', 'tay-tag');
+    render(el, getText(item));
+    if (o.deletion) {
+      el.appendChild(dom('span', 'tay-tag-remove'));
+    }
+    buffer.appendChild(el);
+  }
+
+  function readValue () {
+    return currentValues.filter(v => v.valid).map(v => v.data);
   }
 
   function createAutocomplete () {
-    var autoText = o.parseText;
-    var autoValue = o.parseValue;
-    var getText = (
-      typeof autoText === 'string' ? s => s[autoText] :
-      typeof autoText === 'function' ? autoText :
-      s => s
-    );
-    var getValue = (
-      typeof autoValue === 'string' ? s => s[autoValue] :
-      typeof autoValue === 'function' ? autoValue :
-      s => s
-    );
     var completer = autocomplete(el, {
       suggestions: o.autocomplete,
       getText,
@@ -265,19 +308,6 @@ function taggy (el, options) {
     return text(tag);
   }
 
-  function createTag (buffer, value) {
-    var trimmed = value.trim();
-    if (trimmed.length === 0) {
-      return;
-    }
-    var el = dom('span', 'tay-tag');
-    render(el, parse(trimmed));
-    if (o.deletion) {
-      el.appendChild(dom('span', 'tay-tag-remove'));
-    }
-    buffer.appendChild(el);
-  }
-
   function focusTag (tag, p) {
     if (!tag) {
       return;
@@ -319,14 +349,6 @@ function taggy (el, options) {
       tag = children[i];
       fn(readTag(tag), tag, i);
     }
-  }
-
-  function readValue () {
-    return currentValues.filter(v => v.valid).map(v => v.data);
-  }
-
-  function defaultParse (value) {
-    return value.trim().toLowerCase();
   }
 
   function defaultValidate (value, tags) {
