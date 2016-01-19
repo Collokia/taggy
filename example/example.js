@@ -5,9 +5,9 @@ void function () {
 
   taggy(ty, {
     autocomplete: [
-      {tagId:"dev:android", descriptionText:"android", taxonomy:"devWorld"},
-      {tagId:"dev:java", descriptionText:"java", taxonomy:"langs"},
-      {tagId:"dev:jvm", descriptionText:"jvm", taxonomy:"other"}
+      { tagId: 'dev:android', descriptionText: 'android', taxonomy: 'devWorld' },
+      { tagId: 'dev:java', descriptionText: 'java', taxonomy: 'langs' },
+      { tagId: 'dev:jvm', descriptionText: 'jvm', taxonomy: 'other' }
     ],
     parseText: 'descriptionText',
     free: false
