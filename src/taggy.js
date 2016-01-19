@@ -74,7 +74,6 @@ function taggy (el, options) {
     value: readValue,
     destroy
   };
-  var entry = { el, api };
 
   evaluate([delimiter], true);
   _noselect = false;
@@ -91,8 +90,8 @@ function taggy (el, options) {
   }
 
   function addItem (data) {
-    let el = renderItem(item);
-    let item = { data, el, valid: true };
+    let item = { data, valid: true };
+    item.el = renderItem(item);
     currentValues.push(item);
     return api;
   }
@@ -107,7 +106,7 @@ function taggy (el, options) {
   }
 
   function renderItem (item) {
-    createTag(before, item);
+    return createTag(before, item);
   }
 
   function removeItemElement (el) {
@@ -117,7 +116,8 @@ function taggy (el, options) {
   }
 
   function createTag (buffer, item) {
-    var empty = typeof item === 'string' && item.trim().length === 0;
+    var {data} = item;
+    var empty = typeof data === 'string' && data.trim().length === 0;
     if (empty) {
       return;
     }
@@ -127,6 +127,7 @@ function taggy (el, options) {
       el.appendChild(dom('span', 'tay-tag-remove'));
     }
     buffer.appendChild(el);
+    return el;
   }
 
   function defaultToItemData (s) {
@@ -160,7 +161,7 @@ function taggy (el, options) {
 
   function destroy () {
     bind(true);
-    if (horse) { horse.destroy(); }
+    if (completer) { completer.destroy(); }
     el.value = '';
     el.className = el.className.replace(inputClass, '');
     parent.className = parent.className.replace(editorClass, '');
@@ -299,7 +300,7 @@ function taggy (el, options) {
   }
 
   function defaultRenderer (container, item) {
-    text(container, getText(item));
+    text(container, getText(item.data));
   }
 
   function defaultReader (tag) {
@@ -334,7 +335,7 @@ function taggy (el, options) {
   }
 
   function each (side, fn) {
-    [...side.children].forEach(tag => fn(readTag(tag), tag, i));
+    [...side.children].forEach((tag, i) => fn(readTag(tag), tag, i));
   }
 
   function defaultValidate (value, tags) {
@@ -342,5 +343,4 @@ function taggy (el, options) {
   }
 }
 
-taggy.find = find;
 module.exports = taggy;

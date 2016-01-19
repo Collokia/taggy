@@ -62,7 +62,6 @@ function autocomplete (el, options) {
     list: ul,
     suggestions: []
   };
-  var entry = { el, api };
 
   retarget(el);
   parent.appendChild(ul);
@@ -485,5 +484,4 @@ function isEditable (el) {
   return false;
 }
 
-autocomplete.find = find;
 module.exports = autocomplete;
