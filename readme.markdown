@@ -20,15 +20,9 @@ Taggy demands one thing of you: **the input must have no siblings.**
 </div>
 ```
 
-If client-side JavaScript never executes, because its disabled or too slow [_(on intermittent mobile network connections, for example)_][3], you should treat user input as a delimited list of tags. When JavaScript does execute, you should consider sending tags as a single string and splitting them on the server-side, for consistency.
-
-### `taggy.find(input)`
-
-Retrieves a previously created instance of taggy associated with the provided `input`. Returns `null` if none can be found.
-
 ### `taggy(input, options={})`
 
-taggy exposes a function to turn an input into a tag list input. Empty spans will be added on both sides of your input element.
+Taggy exposes a function to turn an input into a tag list input. Empty spans will be added on both sides of your input element.
 
 A few options may be provided. They are detailed below.
 
@@ -40,33 +34,13 @@ When `true`, humans will be able to delete individual tags by clicking on an ico
 
 The separator between tags. Defaults to `' '`. Must be a single character.
 
-###### `render(container, text)`
+###### `render(container, item)`
 
 A method that's called whenever a tag should be rendered. Defaults to the method below.
 
 ```js
-function render (container, text) {
-  container.innerText = container.textContent = text;
-}
-```
-
-###### `readTag(el)`
-
-This is called whenever the tag has to be converted back to text. By default the text contents of the DOM element are returned, but you may have a more complicated DOM structure that demands you return the textual tag personally.
-
-```js
-function readTag (el) {
-  return el.innerText || el.textContent;
-}
-```
-
-###### `parse(value)`
-
-A method that's called whenever user input is evaluated as a tag. Useful to transform user input. Defaults to the method below.
-
-```js
-function parse (value) {
-  return value.trim().toLowerCase();
+function render (container, item) {
+  container.innerText = container.textContent = item;
 }
 ```
 
@@ -90,17 +64,9 @@ By default tags are converted whenever the `focus` event fires on elements other
 
 When you call `taggy(input, options)`, you'll get back a tiny API to interact with the instance. Calling `taggy` repeatedly on the same DOM element will have no effect, and it will return the same API object.
 
-### `.tags()`
-
-Returns an array with the tags currently held by the input. Any "partial" tags _(e.g, not extracted from the input)_ will be returned as well.
-
 ### `.value()`
 
-Returns the input value as a delimited list of tags. This is the recommended format in which you should send values to the server, because of progressive enhancement.
-
-### `.convert(everything=false)`
-
-Parses text to the left of the caret into tags. If `everything` was true, it'll parse everything into tags instead. Useful for binding your own event handlers and deciding when to convert text into tags.
+Returns the list of tags as an array.
 
 ### `.destroy()`
 

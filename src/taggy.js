@@ -71,7 +71,6 @@ function taggy (el, options) {
     addItem,
     removeItem,
     value: readValue,
-    convert,
     destroy
   };
   var entry = { el, api };
@@ -167,7 +166,7 @@ function taggy (el, options) {
     if (after.parentElement) { after.parentElement.removeChild(after); }
     shrinker.destroy();
     api.destroyed = true;
-    api.destroy = () => api;
+    api.destroy = api.addItem = api.removeItem = () => api;
     api.tags = api.value = () => null;
     return api;
   }
