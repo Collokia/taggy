@@ -144,8 +144,10 @@ function taggy (el, options) {
   }
 
   function createAutocomplete () {
+    var limit = Number(o.autocompleteLimit) || Infinity;
     var completer = autocomplete(el, {
       suggestions: o.autocomplete,
+      limit,
       getText,
       getValue,
       set (s) {
