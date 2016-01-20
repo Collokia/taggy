@@ -165,8 +165,11 @@ function taggy (el, options) {
         addItem(s);
       },
       filter (q, suggestion) {
-        if (findItem(suggestion)) {
+        if (o.autocompleteDuplicates !== false && findItem(suggestion)) {
           return false;
+        }
+        if (o.autocompleteFilter) {
+          return o.autocompleteFilter(q, suggestion);
         }
         return completer.defaultFilter(q, suggestion);
       }
