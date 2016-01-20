@@ -22,6 +22,7 @@
   },
   "dependencies": {
     "bullseye": "1.4.6",
+    "contra": "1.9.1",
     "crossvent": "1.5.4",
     "fuzzysearch": "1.0.3",
     "horsey": "3.0.0",

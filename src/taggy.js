@@ -1,6 +1,7 @@
 'use strict';
 
 var crossvent = require('crossvent');
+var emitter = require('contra/emitter');
 var dom = require('./dom');
 var text = require('./text');
 var selection = require('./selection');
@@ -69,21 +70,21 @@ function taggy (el, options) {
     completer = createAutocomplete();
   }
 
-  var api = {
+  var api = emitter({
     addItem,
-    removeItem,
+    removeItem: removeItemByData,
     value: readValue,
     destroy
-  };
+  });
 
   evaluate([delimiter], true);
   _noselect = false;
 
   return api;
 
-  function findItem (data) {
+  function findItem (value, prop) {
     for (let i = 0; i < currentValues.length; i++) {
-      if (currentValues[i].data === data) {
+      if (currentValues[i][prop || 'data'] === value) {
         return currentValues[i];
       }
     }
@@ -98,16 +99,25 @@ function taggy (el, options) {
     }
     item.el = el;
     currentValues.push(item);
+    api.emit('add', data, el);
     return api;
   }
 
-  function removeItem (data) {
-    var item = findItem(data);
+  function removeItem (item) {
     if (item) {
       removeItemElement(item.el);
       currentValues.splice(currentValues.indexOf(item), 1);
+      api.emit('remove', item.data);
     }
     return api;
+  }
+
+  function removeItemByData (data) {
+    return removeItem(findItem(data));
+  }
+
+  function removeItemByElement (el) {
+    return removeItem(findItem(el, 'el'));
   }
 
   function renderItem (item) {
@@ -153,6 +163,12 @@ function taggy (el, options) {
       set (s) {
         el.value = '';
         addItem(s);
+      },
+      filter (q, suggestion) {
+        if (findItem(suggestion)) {
+          return false;
+        }
+        return completer.defaultFilter(q, suggestion);
       }
     });
     return completer;
@@ -223,7 +239,6 @@ function taggy (el, options) {
     if (all) {
       each(after, moveLeft);
     }
-    crossvent.fabricate(el, 'taggy-converted');
     return api;
   }
 
@@ -258,7 +273,7 @@ function taggy (el, options) {
       }
     } else {
       if (key === BACKSPACE && sel.start === 0 && (sel.end === 0 || sel.end !== el.value.length) && before.lastChild) {
-        before.removeChild(before.lastChild);
+        removeItemByElement(before.lastChild);
       } else if (sinkableKeys.indexOf(key) !== -1) {
         // just prevent default
       } else {
@@ -301,7 +316,6 @@ function taggy (el, options) {
     p.end -= removal;
     if (_noselect !== true) { selection(el, p); }
     shrinker.refresh();
-    crossvent.fabricate(el, 'taggy-evaluated');
   }
 
   function cleanup () {
@@ -317,6 +331,7 @@ function taggy (el, options) {
         tagElement.parentElement.removeChild(tagElement);
       } else {
         tagElement.classList.add('tay-duplicate');
+        api.emit('add', value, tagElement);
       }
     }
   }

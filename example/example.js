@@ -9,7 +9,6 @@ void function () {
       { tagId: 'dev:java', descriptionText: 'java', taxonomy: 'langs' },
       { tagId: 'dev:jvm', descriptionText: 'jvm', taxonomy: 'other' }
     ],
-    autocompleteLimit: 5,
     parseText: 'descriptionText',
     free: false
   });

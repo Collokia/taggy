@@ -70,16 +70,7 @@ Returns the list of tags as an array.
 
 ### `.destroy()`
 
-Removes all event listeners, CSS classes, and DOM elements created by taggy. The input's `value` is set to the output of `.values()`. Once the instance is destroyed it becomes useless, and you'll have to call `taggy(input, options)` once again if you want to restore the behavior.
-
-# Events
-
-Once you've instantiated a `taggy`, some propietary synthetic events will be emitted on the provided `input`.
-
-Name                 | Description
----------------------|---------------------------------------------------------------------------------
-`taggy-converted`    | Fired after a tag has been converted
-`taggy-evaluated`    | Fired after a tag has been converted or the input moved to edit another tag
+Removes all event listeners, CSS classes, and DOM elements created by taggy. The input's `value` is set to the output of `.value()`. Once the instance is destroyed it becomes useless, and you'll have to call `taggy(input, options)` once again if you want to restore the behavior.
 
 [1]: http://stackoverflow.com/questions/ask
 [2]: https://github.com/bevacqua/rome
