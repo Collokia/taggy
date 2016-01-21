@@ -2,9 +2,12 @@ void function () {
   'use strict';
 
   var foo = {};
+  var cache = window.cache = {};
 
   taggy(ty, {
     autocomplete: {
+      cache: cache,
+      source: 'https://ponyfoo.com/search',
       suggestions: [
         { tagId: 'dev:android', descriptionText: 'android', taxonomy: 'devWorld' },
         { tagId: 'dev:java', descriptionText: 'java', taxonomy: 'langs' },

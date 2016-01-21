@@ -157,11 +157,12 @@ function taggy (el, options) {
 
   function createAutocomplete () {
     var config = o.autocomplete;
-    var cache = config.cache || { duration: Infinity };
+    var cache = config.cache || {};
     var noSource = !config.source;
     if (noSource && !config.suggestions) {
       return;
     }
+    var req;
     var limit = Number(config.limit) || Infinity;
     var suggestions = noSource && config.suggestions || suggest;
     var completer = autocomplete(el, {
@@ -185,19 +186,34 @@ function taggy (el, options) {
     });
     return completer;
     function suggest (q, done) {
-      var hash = sum(q); // fast, case insensitive, prevents collisions
+      var query = q.trim();
+      if (query.length === 0) {
+        done([]); return;
+      }
+      if (req) {
+        try {
+          req.abort();
+          req = null;
+        } catch (e) {
+        }
+      }
+      var hash = sum(query); // fast, case insensitive, prevents collisions
       var entry = cache[hash];
       if (entry) {
-        let fresh = entry.created + cache.duration > new Date();
+        let start = entry.created.getTime();
+        let duration = cache.duration || 60 * 60 * 24;
+        let diff = duration * 1000;
+        let fresh = new Date(start + diff) > new Date();
         if (fresh) {
           done(entry.items); return;
         }
       }
+      let encoded = encodeURIComponent(query).replace(/ /g, '+');
       let xhrOpts = {
-        url: config.source + '?q=' + encodeURIComponent(q).replace(/ /g, '+'),
+        url: config.source + '?q=' + encoded,
         json: true
       };
-      xhr(xhrOpts, function (err, res, body) {
+      req = xhr(xhrOpts, function (err, res, body) {
         var items = Array.isArray(body) ? body : [];
         cache[hash] = { created: new Date(), items };
         done(items);
