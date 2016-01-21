@@ -1,5 +1,7 @@
 'use strict';
 
+var xhr = require('xhr');
+var sum = require('hash-sum');
 var crossvent = require('crossvent');
 var emitter = require('contra/emitter');
 var dom = require('./dom');
@@ -154,9 +156,16 @@ function taggy (el, options) {
   }
 
   function createAutocomplete () {
-    var limit = Number(o.autocompleteLimit) || Infinity;
+    var config = o.autocomplete;
+    var cache = config.cache || { duration: Infinity };
+    var noSource = !config.source;
+    if (noSource && !config.suggestions) {
+      return;
+    }
+    var limit = Number(config.limit) || Infinity;
+    var suggestions = noSource && config.suggestions || suggest;
     var completer = autocomplete(el, {
-      suggestions: o.autocomplete,
+      suggestions,
       limit,
       getText,
       getValue,
@@ -165,16 +174,35 @@ function taggy (el, options) {
         addItem(s);
       },
       filter (q, suggestion) {
-        if (o.autocompleteDuplicates !== false && findItem(suggestion)) {
+        if (config.duplicates !== false && findItem(suggestion)) {
           return false;
         }
-        if (o.autocompleteFilter) {
-          return o.autocompleteFilter(q, suggestion);
+        if (config.filter) {
+          return config.filter(q, suggestion);
         }
         return completer.defaultFilter(q, suggestion);
       }
     });
     return completer;
+    function suggest (q, done) {
+      var hash = sum(q); // fast, case insensitive, prevents collisions
+      var entry = cache[hash];
+      if (entry) {
+        let fresh = entry.created + cache.duration > new Date();
+        if (fresh) {
+          done(entry.items); return;
+        }
+      }
+      let xhrOpts = {
+        url: config.source + '?q=' + encodeURIComponent(q).replace(/ /g, '+'),
+        json: true
+      };
+      xhr(xhrOpts, function (err, res, body) {
+        var items = Array.isArray(body) ? body : [];
+        cache[hash] = { created: new Date(), items };
+        done(items);
+      });
+    }
   }
 
   function bind (remove) {
@@ -277,9 +305,7 @@ function taggy (el, options) {
     } else {
       if (key === BACKSPACE && sel.start === 0 && (sel.end === 0 || sel.end !== el.value.length) && before.lastChild) {
         removeItemByElement(before.lastChild);
-      } else if (sinkableKeys.indexOf(key) !== -1) {
-        // just prevent default
-      } else {
+      } else if (sinkableKeys.indexOf(key) === -1) { // prevent default otherwise
         return;
       }
     }

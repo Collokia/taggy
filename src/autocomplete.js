@@ -30,7 +30,7 @@ function autocomplete (el, options) {
   var anyInput;
   var ranchorleft;
   var ranchorright;
-  var suggestionsLoad = { counter: 0, value: null };
+  var state = { counter: 0, value: null };
 
   if (o.autoHideOnBlur === void 0) { o.autoHideOnBlur = true; }
   if (o.autoHideOnClick === void 0) { o.autoHideOnClick = true; }
@@ -89,13 +89,13 @@ function autocomplete (el, options) {
     if (typeof suggestions === 'function') {
       crossvent.remove(attachment, 'focus', loading);
       var value = textInput ? el.value : el.innerHTML;
-      if (value !== suggestionsLoad.value) {
-        suggestionsLoad.counter++;
-        suggestionsLoad.value = value;
+      if (value !== state.value) {
+        state.counter++;
+        state.value = value;
 
-        var counter = suggestionsLoad.counter;
-        suggestions(value, function(s) {
-          if (suggestionsLoad.counter === counter) {
+        var counter = state.counter;
+        suggestions(value, function (s) {
+          if (state.counter === counter) {
             loaded(s, forceShow);
           }
         });
