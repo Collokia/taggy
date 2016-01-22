@@ -13,7 +13,7 @@
   "homepage": "https://github.com/Collokia/taggy",
   "main": "dist/taggy.js",
   "scripts": {
-    "start": "watchify -s taggy -t [ babelify --presets [ es2015 ] ] -do dist/taggy.js src/taggy.js & stylus -w taggy.styl -o dist",
+    "start": "watchify -vs taggy -t [ babelify --presets [ es2015 ] ] -do dist/taggy.js src/taggy.js & stylus -w taggy.styl -o dist",
     "scripts": "jshint . && browserify -s taggy -t [ babelify --presets [ es2015 ] ] -do dist/taggy.js src/taggy.js && uglifyjs -m -c -o dist/taggy.min.js dist/taggy.js",
     "styles": "stylus taggy.styl -o dist && cleancss dist/taggy.css -o dist/taggy.min.css",
     "build": "npm run scripts && npm run styles",

@@ -88,7 +88,7 @@ function autocomplete (el, options) {
   function loading (forceShow) {
     if (typeof suggestions === 'function') {
       crossvent.remove(attachment, 'focus', loading);
-      var value = textInput ? el.value : el.innerHTML;
+      var value = readInput();
       if (value !== state.value) {
         state.counter++;
         state.value = value;
@@ -120,9 +120,14 @@ function autocomplete (el, options) {
     }
   }
 
+  function readInput () {
+    return textInput ? el.value : el.innerHTML;
+  }
+
   function add (suggestion) {
     var li = tag('li', 'tac-item');
     render(li, suggestion);
+    breakupForHighlighter(li);
     crossvent.add(li, 'click', clickedSuggestion);
     crossvent.add(li, 'autocomplete-filter', filterItem);
     crossvent.add(li, 'autocomplete-hide', hideItem);
@@ -139,7 +144,7 @@ function autocomplete (el, options) {
     }
 
     function filterItem () {
-      var value = textInput ? el.value : el.innerHTML;
+      var value = readInput();
       if (filter(value, suggestion)) {
         li.className = li.className.replace(/ tac-hide/g, '');
       } else {
@@ -155,6 +160,63 @@ function autocomplete (el, options) {
         }
       }
     }
+  }
+
+  function breakupForHighlighter (el) {
+    getTextChildren(el).forEach(el => {
+      var parent = el.parentElement;
+      var text = el.textContent || el.nodeValue || '';
+      if (text.length === 0) {
+        return;
+      }
+      for (let char of text) {
+        parent.insertBefore(spanFor(char), el);
+      }
+      parent.removeChild(el);
+      function spanFor (char) {
+        var span = doc.createElement('span');
+        span.className = 'tac-char';
+        span.textContent = span.innerText = char;
+        return span;
+      }
+    });
+  }
+
+  function highlight (el, needle) {
+    var chars = [...el.querySelectorAll('.tac-char')];
+
+    for (let input of needle) {
+      while (chars.length) {
+        let char = chars.shift();
+        let charText = char.innerText || char.textContent;
+        if (charText === input) {
+          on(char);
+          break;
+        } else {
+          off(char);
+        }
+      }
+    }
+    while (chars.length) {
+      off(chars.shift());
+    }
+
+    function on (ch) {
+      char.classList.add('tac-char-highlight');
+    }
+    function off (ch) {
+      char.classList.remove('tac-char-highlight');
+    }
+  }
+
+  function getTextChildren (el) {
+    var texts = [];
+    var walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null, false);
+    var node;
+    while (node = walker.nextNode()) {
+      texts.push(node);
+    }
+    return texts;
   }
 
   function set (value) {
@@ -292,15 +354,16 @@ function autocomplete (el, options) {
     loading(true);
     crossvent.fabricate(attachment, 'autocomplete-filter');
     var li = ul.firstChild;
+    var value = readInput().trim();
     var count = 0;
     while (li) {
       if (count >= limit) {
         crossvent.fabricate(li, 'autocomplete-hide');
-      }
-      if (count < limit) {
+      } else {
         crossvent.fabricate(li, 'autocomplete-filter');
         if (li.className.indexOf('tac-hide') === -1) {
           count++;
+          highlight(li, value);
         }
       }
       li = li.nextSibling;
