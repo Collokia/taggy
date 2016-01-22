@@ -9,10 +9,13 @@ void function () {
       // cache: cache,
       // source: 'https://ponyfoo.com/search',
       suggestions: [
-        { tagId: 'dev:android', descriptionText: 'android', taxonomy: 'devWorld' },
-        { tagId: 'dev:java', descriptionText: 'java', taxonomy: 'langs' },
-        { tagId: 'dev:jvm', descriptionText: 'jvm', taxonomy: 'other' }
-      ]
+        { tagId: 'dev:android', descriptionText: 'dev-android', taxonomy: 'devWorld' },
+        { tagId: 'dev:java', descriptionText: 'dev-java', taxonomy: 'langs' },
+        { tagId: 'dev:jvm', descriptionText: 'dev-jvm', taxonomy: 'other' }
+      ],
+      prefix (fullText) {
+        return fullText.split('-')[0];
+      }
     },
     parseText: 'descriptionText',
     free: false

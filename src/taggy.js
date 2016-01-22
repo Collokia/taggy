@@ -157,6 +157,7 @@ function taggy (el, options) {
 
   function createAutocomplete () {
     var config = o.autocomplete;
+    var prefix = config.prefix;
     var cache = config.cache || {};
     var noSource = !config.source;
     if (noSource && !config.suggestions) {
@@ -170,6 +171,7 @@ function taggy (el, options) {
       limit,
       getText,
       getValue,
+      prefix,
       set (s) {
         el.value = '';
         addItem(s);
@@ -321,6 +323,7 @@ function taggy (el, options) {
     } else {
       if (key === BACKSPACE && sel.start === 0 && (sel.end === 0 || sel.end !== el.value.length) && before.lastChild) {
         removeItemByElement(before.lastChild);
+        if (completer) { completer.refreshPosition(); }
       } else if (sinkableKeys.indexOf(key) === -1) { // prevent default otherwise
         return;
       }

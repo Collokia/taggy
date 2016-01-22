@@ -136,11 +136,18 @@ function autocomplete (el, options) {
     return li;
 
     function clickedSuggestion () {
+      var input = getText(suggestion);
       var value = getValue(suggestion);
       set(value);
       hide();
       attachment.focus();
-      crossvent.fabricate(attachment, 'autocomplete-selected', value);
+      var prefix = o.prefix && o.prefix(input);
+      if (prefix) {
+        el.value = prefix;
+        el.select();
+        show();
+        filtering();
+      }
     }
 
     function filterItem () {
