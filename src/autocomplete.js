@@ -202,10 +202,10 @@ function autocomplete (el, options) {
     }
 
     function on (ch) {
-      char.classList.add('tac-char-highlight');
+      ch.classList.add('tac-char-highlight');
     }
     function off (ch) {
-      char.classList.remove('tac-char-highlight');
+      ch.classList.remove('tac-char-highlight');
     }
   }
 
