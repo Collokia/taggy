@@ -39,7 +39,6 @@ function taggy (el, options) {
   var free = o.free !== false;
   var validate = o.validate || defaultValidate;
   var render = o.render || defaultRenderer;
-  var readTag = o.readTag || defaultReader;
 	var convertOnFocus = o.convertOnFocus !== false;
 
   var toItemData = defaultToItemData;
@@ -375,10 +374,10 @@ function taggy (el, options) {
     function detect (value, tagElement) {
       if (validate(value, tags.slice())) {
         tags.push(value);
-      } else if (o.preventDuplicates) {
+      } else if (o.preventInvalid) {
         tagElement.parentElement.removeChild(tagElement);
       } else {
-        tagElement.classList.add('tay-duplicate');
+        tagElement.classList.add('tay-invalid');
         api.emit('add', value, tagElement);
       }
     }
@@ -388,7 +387,7 @@ function taggy (el, options) {
     text(container, getText(item.data));
   }
 
-  function defaultReader (tag) {
+  function readTag (tag) {
     return text(tag);
   }
 

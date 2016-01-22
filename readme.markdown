@@ -26,6 +26,10 @@ Taggy exposes a function to turn an input into a tag list input. Empty spans wil
 
 A few options may be provided. They are detailed below.
 
+###### `free`
+
+Defaults to `true`. When this flag is turned off, options can only be picked from the autocomplete list, they can't be edited, but they can still be deleted entirely using backspace.
+
 ###### `deletion`
 
 When `true`, humans will be able to delete individual tags by clicking on an icon.
@@ -34,19 +38,37 @@ When `true`, humans will be able to delete individual tags by clicking on an ico
 
 The separator between tags. Defaults to `' '`. Must be a single character.
 
+###### `preventInvalid`
+
+This option will prevent tags identified as invalid from being added. By default this is turned off and they just get a `tay-invalid` CSS class.
+
 ###### `render(container, item)`
 
-A method that's called whenever a tag should be rendered. Defaults to the method below.
+A method that's called whenever a tag should be rendered. Defaults to setting `getText(item)` as the container's text.
 
-```js
-function render (container, item) {
-  container.innerText = container.textContent = item;
-}
-```
+###### `parseText`
+
+When you have complex data items from autocomplete, you need to set `parseText` to read the value that should be used as a display value.
+
+###### `parseText`
+
+When you have complex data items from autocomplete, you need to set `parseText` to read the value that should be used as each tag's value.
+
+###### `autocomplete`
+
+Expects an object that defines how the autocomplete list is configured.
+
+- `prefix(text)` runs when a tag is inserted. The returned string is used to pre-fill the text input. Useful to avoid repetitive prefixes
+- `cache` can be an object that will be used to store queries and suggestions. You can provide a `cache.duration` as well, which defaults to one day and is specified in seconds. The `cache.duration` is used to figure out whether cache entries are fresh or stale
+- `suggestions` can be a static list of suggestions for the autocomplete list
+- `source`: Alternative to `suggestions`. `source` is an HTTP `GET` endpoint string that gets appended `'?q=' + query`. The server is expected to return a JSON response with an array of autocomplete suggestion objects for the provided query
+- `limit` can be a number that determines the maximum amount of suggestions shown in the autocomplete list
+- `filter(query, suggestion)`: By default suggestions are filtered using the [`fuzzysearch`](https://github.com/bevacqua/fuzzysearch) algorithm. You can change that and use your own `filter` algorithm instead
+- `duplicates` specifies whether the autocomplete list should show tags that are already selected
 
 ###### `validate(value, tags)`
 
-A method that validates whether the _(previously `parse`d)_ user input `value` constitutes a valid tag, taking into account the currently valid `tags`. Useful to filter out duplicates. Defaults to the method below.
+A method that validates whether the user input `value` constitutes a valid tag, taking into account the currently valid `tags`. Useful to filter out duplicates. Defaults to the method below.
 
 ```js
 function validate (value, tags) {
