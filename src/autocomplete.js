@@ -360,9 +360,9 @@ function autocomplete (el, options) {
     }
     loading(true);
     crossvent.fabricate(attachment, 'autocomplete-filter');
-    const li = ul.firstChild;
     const value = readInput().trim();
-    const count = 0;
+    let li = ul.firstChild;
+    let count = 0;
     while (li) {
       if (count >= limit) {
         crossvent.fabricate(li, 'autocomplete-hide');
@@ -400,7 +400,7 @@ function autocomplete (el, options) {
   }
 
   function autocompleteEventTarget (e) {
-    const target = e.target;
+    let target = e.target;
     if (target === attachment) {
       return true;
     }
@@ -487,9 +487,9 @@ function autocomplete (el, options) {
   }
 
   function loopbackToAnchor (text, p) {
-    const result = '';
-    const anchored = false;
-    const start = p.start;
+    let result = '';
+    let anchored = false;
+    let start = p.start;
     while (anchored === false && start >= 0) {
       result = text.substr(start - 1, p.start - start + 1);
       anchored = ranchorleft.test(result);
