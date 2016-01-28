@@ -13,7 +13,7 @@ const KEY_TAB = 9;
 const doc = document;
 const docElement = doc.documentElement;
 
-function autocomplete (el, options) {
+export default function autocomplete (el, options) {
   const o = options || {};
   const parent = o.appendTo || doc.body;
   const render = o.render || defaultRenderer;
@@ -497,7 +497,7 @@ function autocomplete (el, options) {
     }
     return {
       text: anchored ? result : null,
-      start: start
+      start
     };
   }
 
@@ -505,7 +505,7 @@ function autocomplete (el, options) {
     const position = sell(el);
     const input = loopbackToAnchor(q, position).text;
     if (input) {
-      return { input: input, suggestion: suggestion };
+      return { input, suggestion };
     }
   }
 
@@ -553,5 +553,3 @@ function isEditable (el) {
   }
   return false;
 }
-
-module.exports = autocomplete;

@@ -1,9 +1,9 @@
 'use strict';
 
-var get = easyGet;
-var set = easySet;
-var inputTag = /input/i;
-var textareaTag = /textarea/i;
+let get = easyGet;
+let set = easySet;
+const inputTag = /input/i;
+const textareaTag = /textarea/i;
 
 if (document.selection && document.selection.createRange) {
   get = hardGet;
@@ -18,22 +18,22 @@ function easyGet (el) {
 }
 
 function hardGet (el) {
-  var active = document.activeElement;
+  const active = document.activeElement;
   if (active !== el) {
     el.focus();
   }
 
-  var range = document.selection.createRange();
-  var bookmark = range.getBookmark();
-  var original = el.value;
-  var marker = getUniqueMarker(original);
-  var parent = range.parentElement();
+  const range = document.selection.createRange();
+  const bookmark = range.getBookmark();
+  const original = el.value;
+  const marker = getUniqueMarker(original);
+  const parent = range.parentElement();
   if (parent === null || !inputs(parent)) {
     return result(0, 0);
   }
   range.text = marker + range.text + marker;
 
-  var contents = el.value;
+  const contents = el.value;
 
   el.value = original;
   range.moveToBookmark(bookmark);
@@ -54,7 +54,7 @@ function hardGet (el) {
 }
 
 function getUniqueMarker (contents) {
-  var marker;
+  let marker;
   do {
     marker = '@@marker.' + Math.random() * new Date();
   } while (contents.indexOf(marker) !== -1);
@@ -71,7 +71,7 @@ function easySet (el, p) {
 }
 
 function hardSet (el, p) {
-  var range = el.createTextRange();
+  const range = el.createTextRange();
 
   if (p.start === 'end' && p.end === 'end') {
     range.collapse(false);
@@ -88,11 +88,9 @@ function special (el, value) {
   return value === 'end' ? el.value.length : value || 0;
 }
 
-function selection (el, p) {
+export default function selection (el, p) {
   if (arguments.length === 2) {
     set(el, p);
   }
   return get(el);
 }
-
-module.exports = selection;

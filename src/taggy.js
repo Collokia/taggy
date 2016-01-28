@@ -23,7 +23,8 @@ const inputClass = /\btay-input\b/g;
 const end = { start: 'end', end: 'end' };
 const defaultDelimiter = ' ';
 
-function taggy (el, options) {
+// module.exports because browserify standalone
+module.exports = function taggy (el, options) {
   const currentValues = [];
   const o = options || {};
   const delimiter = o.delimiter || defaultDelimiter;
@@ -445,5 +446,3 @@ function taggy (el, options) {
     return tags.indexOf(value) === -1;
   }
 }
-
-module.exports = taggy;

@@ -1,7 +1,7 @@
 'use strict';
 
-module.exports = function dom (tagName, classes) {
-  var el = document.createElement(tagName);
+export default function dom (tagName, classes) {
+  const el = document.createElement(tagName);
   if (classes) {
     el.className = classes;
   }

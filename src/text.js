@@ -1,6 +1,6 @@
 'use strict';
 
-function text (el, value) {
+export default function text (el, value) {
   if (arguments.length === 2) {
     el.innerText = el.textContent = value;
   }
@@ -9,5 +9,3 @@ function text (el, value) {
   }
   return el.textContent;
 }
-
-module.exports = text;
