@@ -62,7 +62,6 @@ function taggy (el, options) {
   parent.className += ' tay-editor';
   parent.insertBefore(before, el);
   parent.insertBefore(after, el.nextSibling);
-  bind();
 
   var shrinker = autosize(el);
   var completer;
@@ -78,6 +77,10 @@ function taggy (el, options) {
     destroy
   });
 
+  var placeheld = true;
+  var placeholder = el.getAttribute('placeholder');
+
+  bind();
   evaluate([delimiter], true);
   _noselect = false;
 
@@ -222,14 +225,35 @@ function taggy (el, options) {
     }
   }
 
+  function updatePlaceholder (e) {
+    var any = parent.querySelector('.tay-tag');
+    if (!any && !placeheld) {
+      el.setAttribute('placeholder', placeholder);
+      placeheld = true;
+    } else if (any && placeheld) {
+      el.removeAttribute('placeholder');
+      placeheld = false;
+    }
+  }
+
   function bind (remove) {
     var op = remove ? 'remove' : 'add';
+    var ev = remove ? 'off' : 'on';
     crossvent[op](el, 'keydown', keydown);
     crossvent[op](el, 'keypress', keypress);
     crossvent[op](el, 'paste', paste);
     crossvent[op](parent, 'click', click);
 		if (convertOnFocus) {
       crossvent[op](document.documentElement, 'focus', documentfocus, true);
+    }
+    if (placeholder) {
+      api[ev]('add', updatePlaceholder);
+      api[ev]('remove', updatePlaceholder);
+      crossvent[op](el, 'keydown', updatePlaceholder);
+      crossvent[op](el, 'keypress', updatePlaceholder);
+      crossvent[op](el, 'paste', updatePlaceholder);
+      crossvent[op](parent, 'click', updatePlaceholder);
+      updatePlaceholder();
     }
   }
 
