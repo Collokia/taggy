@@ -74,6 +74,7 @@ function taggy (el, options) {
   var api = emitter({
     addItem,
     removeItem: removeItemByData,
+    removeItemByElement,
     value: readValue,
     destroy
   });
@@ -378,7 +379,7 @@ function taggy (el, options) {
         tagElement.parentElement.removeChild(tagElement);
       } else {
         tagElement.classList.add('tay-invalid');
-        api.emit('add', value, tagElement);
+        api.emit('invalid', value, tagElement);
       }
     }
   }

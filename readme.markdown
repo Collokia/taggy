@@ -86,6 +86,18 @@ By default tags are converted whenever the `focus` event fires on elements other
 
 When you call `taggy(input, options)`, you'll get back a tiny API to interact with the instance. Calling `taggy` repeatedly on the same DOM element will have no effect, and it will return the same API object.
 
+### `.addItem(data)`
+
+Adds an item to the input. The `data` parameter could be a string or a complex object, depending on your instance configuration.
+
+### `.removeItem(data)`
+
+Removes an item from the input. The item is found using the `data` string or object.
+
+### `.removeItemByElement(data)`
+
+Removes an item from the input. The item is found using a `.tay-tag` DOM element.
+
 ### `.value()`
 
 Returns the list of tags as an array.
@@ -93,6 +105,30 @@ Returns the list of tags as an array.
 ### `.destroy()`
 
 Removes all event listeners, CSS classes, and DOM elements created by taggy. The input's `value` is set to the output of `.value()`. Once the instance is destroyed it becomes useless, and you'll have to call `taggy(input, options)` once again if you want to restore the behavior.
+
+### Events
+
+The instance API comes with a few events.
+
+Event | Arguments | Description
+----|-------|------------
+`add` | `data`, `el` | Emitted whenever a new item is added to the list
+`remove` | `data` | Emitted whenever an item is removed from the list
+`invalid` | `data`, `el` | Emitted whenever an invalid item is added to the list
+
+You can listen to these events using the following API.
+
+```js
+var input = taggy(el);
+input.on('add', data => console.log(data)); // listen to an event
+input.once('invalid', data => throw new Error('invalid data')); // listener discarded after one execution
+
+input.on('foo', bar);
+input.off('foo', bar); // removes listener
+
+function bar () {}
+```
+
 
 [1]: http://stackoverflow.com/questions/ask
 [2]: https://github.com/bevacqua/rome
