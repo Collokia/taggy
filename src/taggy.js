@@ -298,6 +298,8 @@ function taggy (el, options) {
   function keydown (e) {
     var sel = selection(el);
     var key = e.which || e.keyCode || e.charCode;
+    var canMoveLeft = sel.start === 0 && sel.end === 0 && before.lastChild;
+    var canMoveRight = sel.start === el.value.length && sel.end === el.value.length && after.firstChild;
     if (free) {
       if (key === HOME) {
         if (before.firstChild) {
@@ -311,22 +313,26 @@ function taggy (el, options) {
         } else {
           selection(el, end);
         }
-      } else if (key === LEFT && sel.start === 0 && before.lastChild) {
+      } else if (key === BACKSPACE && canMoveLeft) {
         focusTag(before.lastChild, end);
-      } else if (key === BACKSPACE && sel.start === 0 && (sel.end === 0 || sel.end !== el.value.length) && before.lastChild) {
-        focusTag(before.lastChild, end);
-      } else if (key === RIGHT && sel.end === el.value.length && after.firstChild) {
+      } else if (key === RIGHT && canMoveRight) {
         focusTag(after.firstChild, {});
+      } else if (key === LEFT && canMoveLeft) {
+        focusTag(before.lastChild, end);
       } else {
         return;
       }
     } else {
-      if (key === BACKSPACE && sel.start === 0 && (sel.end === 0 || sel.end !== el.value.length) && before.lastChild) {
+      if (key === BACKSPACE && canMoveLeft) {
         removeItemByElement(before.lastChild);
-        if (completer) { completer.refreshPosition(); }
+      } else if (key === RIGHT && canMoveRight) {
+        before.appendChild(after.firstChild);
+      } else if (key === LEFT && canMoveLeft) {
+        after.insertBefore(before.lastChild, after.firstChild);
       } else if (sinkableKeys.indexOf(key) === -1) { // prevent default otherwise
         return;
       }
+      if (completer) { completer.refreshPosition(); }
     }
 
     e.preventDefault();
