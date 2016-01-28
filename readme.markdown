@@ -61,7 +61,7 @@ Expects an object that defines how the autocomplete list is configured.
 - `prefix(text)` runs when a tag is inserted. The returned string is used to pre-fill the text input. Useful to avoid repetitive prefixes
 - `cache` can be an object that will be used to store queries and suggestions. You can provide a `cache.duration` as well, which defaults to one day and is specified in seconds. The `cache.duration` is used to figure out whether cache entries are fresh or stale
 - `suggestions` can be a static list of suggestions for the autocomplete list
-- `source`: Alternative to `suggestions`. `source` is an HTTP `GET` endpoint string that gets appended `'?q=' + query`. The server is expected to return a JSON response with an array of autocomplete suggestion objects for the provided query
+- `source`: Alternative to `suggestions`. `source(query)` should be a function that returns a promise. The promise should fulfill to an array of autocomplete suggestion objects for the provided `query`.
 - `limit` can be a number that determines the maximum amount of suggestions shown in the autocomplete list
 - `filter(query, suggestion)`: By default suggestions are filtered using the [`fuzzysearch`](https://github.com/bevacqua/fuzzysearch) algorithm. You can change that and use your own `filter` algorithm instead
 - `duplicates` specifies whether the autocomplete list should show tags that are already selected

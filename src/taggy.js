@@ -1,6 +1,5 @@
 'use strict';
 
-var xhr = require('xhr');
 var sum = require('hash-sum');
 var crossvent = require('crossvent');
 var emitter = require('contra/emitter');
@@ -210,16 +209,16 @@ function taggy (el, options) {
           done(entry.items); return;
         }
       }
-      let encoded = encodeURIComponent(query).replace(/ /g, '+');
-      let xhrOpts = {
-        url: config.source + '?q=' + encoded,
-        json: true
-      };
-      req = xhr(xhrOpts, function (err, res, body) {
-        var items = Array.isArray(body) ? body : [];
-        cache[hash] = { created: new Date(), items };
-        done(items);
-      });
+      config.source(query)
+        .then(data => {
+          var items = Array.isArray(data) ? data : [];
+          cache[hash] = { created: new Date(), items };
+          done(items);
+        })
+        .catch(error => {
+          console.log('Autocomplete source promise rejected', error, el);
+          done([]);
+        });
     }
   }
 
