@@ -1,13 +1,10 @@
 void function () {
   'use strict';
 
-  var foo = {};
-  var cache = window.cache = {};
+  var $ = document.querySelector.bind(document);
 
-  taggy(ty, {
+  taggy($('#fixed'), {
     autocomplete: {
-      // cache: cache,
-      // source: 'https://ponyfoo.com/search',
       suggestions: [
         { tagId: 'dev:android', descriptionText: 'dev-android', taxonomy: 'devWorld' },
         { tagId: 'dev:java', descriptionText: 'dev-java', taxonomy: 'langs' },
@@ -21,20 +18,5 @@ void function () {
     free: false
   });
 
-  function events (el, type, fn) {
-    if (el.addEventListener) {
-      el.addEventListener(type, fn);
-    } else if (el.attachEvent) {
-      el.attachEvent('on' + type, wrap(fn));
-    } else {
-      el['on' + type] = wrap(fn);
-    }
-    function wrap (originalEvent) {
-      var e = originalEvent || global.event;
-      e.target = e.target || e.srcElement;
-      e.preventDefault  = e.preventDefault  || function preventDefault () { e.returnValue = false; };
-      e.stopPropagation = e.stopPropagation || function stopPropagation () { e.cancelBubble = true; };
-      fn.call(el, e);
-    }
-  }
+  taggy($('#free'), {});
 }();
