@@ -1,36 +1,36 @@
 'use strict';
 
-var sell = require('sell');
-var crossvent = require('crossvent');
-var bullseye = require('bullseye');
-var fuzzysearch = require('fuzzysearch');
-var KEY_BACKSPACE = 8;
-var KEY_ENTER = 13;
-var KEY_ESC = 27;
-var KEY_UP = 38;
-var KEY_DOWN = 40;
-var KEY_TAB = 9;
-var doc = document;
-var docElement = doc.documentElement;
+import sell from 'sell';
+import crossvent from 'crossvent';
+import bullseye from 'bullseye';
+import fuzzysearch from 'fuzzysearch';
+const KEY_BACKSPACE = 8;
+const KEY_ENTER = 13;
+const KEY_ESC = 27;
+const KEY_UP = 38;
+const KEY_DOWN = 40;
+const KEY_TAB = 9;
+const doc = document;
+const docElement = doc.documentElement;
 
 function autocomplete (el, options) {
-  var o = options || {};
-  var parent = o.appendTo || doc.body;
-  var render = o.render || defaultRenderer;
-  var {getText, getValue, form, suggestions} = o;
-  var limit = typeof o.limit === 'number' ? o.limit : Infinity;
-  var userFilter = o.filter || defaultFilter;
-  var userSet = o.set || defaultSetter;
-  var ul = tag('ul', 'tac-list');
-  var selection = null;
-  var eye;
-  var deferredFiltering = defer(filtering);
-  var attachment = el;
-  var textInput;
-  var anyInput;
-  var ranchorleft;
-  var ranchorright;
-  var state = { counter: 0, value: null };
+  const o = options || {};
+  const parent = o.appendTo || doc.body;
+  const render = o.render || defaultRenderer;
+  const {getText, getValue, form, suggestions} = o;
+  const limit = typeof o.limit === 'number' ? o.limit : Infinity;
+  const userFilter = o.filter || defaultFilter;
+  const userSet = o.set || defaultSetter;
+  const ul = tag('ul', 'tac-list');
+  const deferredFiltering = defer(filtering);
+  const state = { counter: 0, value: null };
+  let selection = null;
+  let eye;
+  let attachment = el;
+  let textInput;
+  let anyInput;
+  let ranchorleft;
+  let ranchorright;
 
   if (o.autoHideOnBlur === void 0) { o.autoHideOnBlur = true; }
   if (o.autoHideOnClick === void 0) { o.autoHideOnClick = true; }
@@ -40,7 +40,7 @@ function autocomplete (el, options) {
     ranchorright = new RegExp(o.anchor + '$');
   }
 
-  var api = {
+  const api = {
     add,
     anchor: o.anchor,
     clear,
@@ -88,12 +88,12 @@ function autocomplete (el, options) {
   function loading (forceShow) {
     if (typeof suggestions === 'function') {
       crossvent.remove(attachment, 'focus', loading);
-      var value = readInput();
+      const value = readInput();
       if (value !== state.value) {
         state.counter++;
         state.value = value;
 
-        var counter = state.counter;
+        const counter = state.counter;
         suggestions(value, function (s) {
           if (state.counter === counter) {
             loaded(s, forceShow);
@@ -125,7 +125,7 @@ function autocomplete (el, options) {
   }
 
   function add (suggestion) {
-    var li = tag('li', 'tac-item');
+    let li = tag('li', 'tac-item');
     render(li, suggestion);
     breakupForHighlighter(li);
     crossvent.add(li, 'click', clickedSuggestion);
@@ -136,12 +136,12 @@ function autocomplete (el, options) {
     return li;
 
     function clickedSuggestion () {
-      var input = getText(suggestion);
-      var value = getValue(suggestion);
+      const input = getText(suggestion);
+      const value = getValue(suggestion);
       set(value);
       hide();
       attachment.focus();
-      var prefix = o.prefix && o.prefix(input);
+      const prefix = o.prefix && o.prefix(input);
       if (prefix) {
         el.value = prefix;
         el.select();
@@ -151,7 +151,7 @@ function autocomplete (el, options) {
     }
 
     function filterItem () {
-      var value = readInput();
+      const value = readInput();
       if (filter(value, suggestion)) {
         li.className = li.className.replace(/ tac-hide/g, '');
       } else {
@@ -171,8 +171,8 @@ function autocomplete (el, options) {
 
   function breakupForHighlighter (el) {
     getTextChildren(el).forEach(el => {
-      var parent = el.parentElement;
-      var text = el.textContent || el.nodeValue || '';
+      const parent = el.parentElement;
+      const text = el.textContent || el.nodeValue || '';
       if (text.length === 0) {
         return;
       }
@@ -181,7 +181,7 @@ function autocomplete (el, options) {
       }
       parent.removeChild(el);
       function spanFor (char) {
-        var span = doc.createElement('span');
+        const span = doc.createElement('span');
         span.className = 'tac-char';
         span.textContent = span.innerText = char;
         return span;
@@ -190,7 +190,7 @@ function autocomplete (el, options) {
   }
 
   function highlight (el, needle) {
-    var chars = [...el.querySelectorAll('.tac-char')];
+    const chars = [...el.querySelectorAll('.tac-char')];
 
     for (let input of needle) {
       while (chars.length) {
@@ -217,9 +217,9 @@ function autocomplete (el, options) {
   }
 
   function getTextChildren (el) {
-    var texts = [];
-    var walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null, false);
-    var node;
+    const texts = [];
+    const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null, false);
+    let node;
     while (node = walker.nextNode()) {
       texts.push(node);
     }
@@ -235,7 +235,7 @@ function autocomplete (el, options) {
 
   function filter (value, suggestion) {
     if (o.anchor) {
-      var il = (isText() ? api.filterAnchoredText : api.filterAnchoredHTML)(value, suggestion);
+      const il = (isText() ? api.filterAnchoredText : api.filterAnchoredHTML)(value, suggestion);
       return il ? userFilter(il.input, il.suggestion) : false;
     }
     return userFilter(value, suggestion);
@@ -254,7 +254,7 @@ function autocomplete (el, options) {
   }
 
   function toggler (e) {
-    var left = e.which === 1 && !e.metaKey && !e.ctrlKey;
+    const left = e.which === 1 && !e.metaKey && !e.ctrlKey;
     if (left === false) {
       return; // we only care about honest to god left-clicks
     }
@@ -285,7 +285,7 @@ function autocomplete (el, options) {
   }
 
   function move (up, moves) {
-    var total = ul.children.length;
+    const total = ul.children.length;
     if (total < moves) {
       unselect();
       return;
@@ -293,9 +293,9 @@ function autocomplete (el, options) {
     if (total === 0) {
       return;
     }
-    var first = up ? 'lastChild' : 'firstChild';
-    var next = up ? 'previousSibling' : 'nextSibling';
-    var suggestion = selection && selection[next] || ul[first];
+    const first = up ? 'lastChild' : 'firstChild';
+    const next = up ? 'previousSibling' : 'nextSibling';
+    const suggestion = selection && selection[next] || ul[first];
 
     select(suggestion);
 
@@ -312,8 +312,8 @@ function autocomplete (el, options) {
   }
 
   function keydown (e) {
-    var shown = visible();
-    var which = e.which || e.keyCode;
+    const shown = visible();
+    const which = e.which || e.keyCode;
     if (which === KEY_DOWN) {
       if (anyInput && o.autoShowOnUpDown) {
         show();
@@ -360,9 +360,9 @@ function autocomplete (el, options) {
     }
     loading(true);
     crossvent.fabricate(attachment, 'autocomplete-filter');
-    var li = ul.firstChild;
-    var value = readInput().trim();
-    var count = 0;
+    const li = ul.firstChild;
+    const value = readInput().trim();
+    const count = 0;
     while (li) {
       if (count >= limit) {
         crossvent.fabricate(li, 'autocomplete-hide');
@@ -384,7 +384,7 @@ function autocomplete (el, options) {
   }
 
   function deferredFilteringNoEnter (e) {
-    var which = e.which || e.keyCode;
+    const which = e.which || e.keyCode;
     if (which === KEY_ENTER) {
       return;
     }
@@ -392,7 +392,7 @@ function autocomplete (el, options) {
   }
 
   function deferredShow (e) {
-    var which = e.which || e.keyCode;
+    const which = e.which || e.keyCode;
     if (which === KEY_ENTER) {
       return;
     }
@@ -400,7 +400,7 @@ function autocomplete (el, options) {
   }
 
   function autocompleteEventTarget (e) {
-    var target = e.target;
+    const target = e.target;
     if (target === attachment) {
       return true;
     }
@@ -413,7 +413,7 @@ function autocomplete (el, options) {
   }
 
   function hideOnBlur (e) {
-    var which = e.which || e.keyCode;
+    const which = e.which || e.keyCode;
     if (which === KEY_TAB) {
       hide();
     }
@@ -427,7 +427,7 @@ function autocomplete (el, options) {
   }
 
   function inputEvents (remove) {
-    var op = remove ? 'remove' : 'add';
+    const op = remove ? 'remove' : 'add';
     if (eye) {
       eye.destroy();
       eye = null;
@@ -474,12 +474,12 @@ function autocomplete (el, options) {
   }
 
   function defaultFilter (q, suggestion) {
-    var needle = q.toLowerCase();
-    var text = getText(suggestion) || '';
+    const needle = q.toLowerCase();
+    const text = getText(suggestion) || '';
     if (fuzzysearch(needle, text.toLowerCase())) {
       return true;
     }
-    var value = getValue(suggestion) || '';
+    const value = getValue(suggestion) || '';
     if (typeof value !== 'string') {
       return false;
     }
@@ -487,9 +487,9 @@ function autocomplete (el, options) {
   }
 
   function loopbackToAnchor (text, p) {
-    var result = '';
-    var anchored = false;
-    var start = p.start;
+    const result = '';
+    const anchored = false;
+    const start = p.start;
     while (anchored === false && start >= 0) {
       result = text.substr(start - 1, p.start - start + 1);
       anchored = ranchorleft.test(result);
@@ -502,20 +502,20 @@ function autocomplete (el, options) {
   }
 
   function filterAnchoredText (q, suggestion) {
-    var position = sell(el);
-    var input = loopbackToAnchor(q, position).text;
+    const position = sell(el);
+    const input = loopbackToAnchor(q, position).text;
     if (input) {
       return { input: input, suggestion: suggestion };
     }
   }
 
   function appendText (value) {
-    var current = el.value;
-    var position = sell(el);
-    var input = loopbackToAnchor(current, position);
-    var left = current.substr(0, input.start);
-    var right = current.substr(input.start + input.text.length + (position.end - position.start));
-    var before = left + value + ' ';
+    const current = el.value;
+    const position = sell(el);
+    const input = loopbackToAnchor(current, position);
+    const left = current.substr(0, input.start);
+    const right = current.substr(input.start + input.text.length + (position.end - position.start));
+    const before = left + value + ' ';
 
     el.value = before + right;
     sell(el, { start: before.length, end: before.length });
@@ -533,7 +533,7 @@ function autocomplete (el, options) {
 function isInput (el) { return el.tagName === 'INPUT' || el.tagName === 'TEXTAREA'; }
 
 function tag (type, className) {
-  var el = doc.createElement(type);
+  const el = doc.createElement(type);
   el.className = className;
   return el;
 }
@@ -541,7 +541,7 @@ function tag (type, className) {
 function defer (fn) { return function () { setTimeout(fn, 0); }; }
 
 function isEditable (el) {
-  var value = el.getAttribute('contentEditable');
+  const value = el.getAttribute('contentEditable');
   if (value === 'false') {
     return false;
   }

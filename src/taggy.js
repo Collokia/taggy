@@ -1,75 +1,71 @@
 'use strict';
 
-var sum = require('hash-sum');
-var crossvent = require('crossvent');
-var emitter = require('contra/emitter');
-var dom = require('./dom');
-var text = require('./text');
-var selection = require('./selection');
-var autosize = require('./autosize');
-var autocomplete = require('./autocomplete');
-var inputTag = /^input$/i;
-var ELEMENT = 1;
-var BACKSPACE = 8;
-var END = 35;
-var HOME = 36;
-var LEFT = 37;
-var RIGHT = 39;
-var sinkableKeys = [END, HOME];
-var tagClass = /\btay-tag\b/;
-var tagRemovalClass = /\btay-tag-remove\b/;
-var editorClass = /\btay-editor\b/g;
-var inputClass = /\btay-input\b/g;
-var end = { start: 'end', end: 'end' };
-var defaultDelimiter = ' ';
+import sum from 'hash-sum';
+import crossvent from 'crossvent';
+import emitter from 'contra/emitter';
+import dom from './dom';
+import text from './text';
+import selection from './selection';
+import autosize from './autosize';
+import autocomplete from './autocomplete';
+const inputTag = /^input$/i;
+const ELEMENT = 1;
+const BACKSPACE = 8;
+const END = 35;
+const HOME = 36;
+const LEFT = 37;
+const RIGHT = 39;
+const sinkableKeys = [END, HOME];
+const tagClass = /\btay-tag\b/;
+const tagRemovalClass = /\btay-tag-remove\b/;
+const editorClass = /\btay-editor\b/g;
+const inputClass = /\btay-input\b/g;
+const end = { start: 'end', end: 'end' };
+const defaultDelimiter = ' ';
 
 function taggy (el, options) {
-  var currentValues = [];
-  var _noselect = document.activeElement !== el;
-  var o = options || {};
-  var delimiter = o.delimiter || defaultDelimiter;
+  const currentValues = [];
+  const o = options || {};
+  const delimiter = o.delimiter || defaultDelimiter;
   if (delimiter.length !== 1) {
     throw new Error('taggy expected a single-character delimiter string');
   }
-  var any = hasSiblings(el);
+  const any = hasSiblings(el);
   if (any || !inputTag.test(el.tagName)) {
     throw new Error('taggy expected an input element without any siblings');
   }
-  var free = o.free !== false;
-  var validate = o.validate || defaultValidate;
-  var render = o.render || defaultRenderer;
-	var convertOnFocus = o.convertOnFocus !== false;
+  let _noselect = document.activeElement !== el;
+  const free = o.free !== false;
+  const validate = o.validate || defaultValidate;
+  const render = o.render || defaultRenderer;
+	const convertOnFocus = o.convertOnFocus !== false;
 
-  var toItemData = defaultToItemData;
+  const toItemData = defaultToItemData;
 
-  var parseText = o.parseText;
-  var parseValue = o.parseValue;
-  var getText = (
+  const parseText = o.parseText;
+  const parseValue = o.parseValue;
+  const getText = (
     typeof parseText === 'string' ? d => d[parseText] :
     typeof parseText === 'function' ? parseText :
     d => d
   );
-  var getValue = (
+  const getValue = (
     typeof parseValue === 'string' ? d => d[parseValue] :
     typeof parseValue === 'function' ? parseValue :
     d => d
   );
 
-  var before = dom('span', 'tay-tags tay-tags-before');
-  var after = dom('span', 'tay-tags tay-tags-after');
-  var parent = el.parentElement;
+  const before = dom('span', 'tay-tags tay-tags-before');
+  const after = dom('span', 'tay-tags tay-tags-after');
+  const parent = el.parentElement;
   el.className += ' tay-input';
   parent.className += ' tay-editor';
   parent.insertBefore(before, el);
   parent.insertBefore(after, el.nextSibling);
 
-  var shrinker = autosize(el);
-  var completer;
-  if (o.autocomplete) {
-    completer = createAutocomplete();
-  }
-
-  var api = emitter({
+  const shrinker = autosize(el);
+  const completer = o.autocomplete ? createAutocomplete() : null;
+  const api = emitter({
     addItem,
     removeItem: removeItemByData,
     removeItemByElement,
@@ -77,8 +73,8 @@ function taggy (el, options) {
     destroy
   });
 
-  var placeheld = true;
-  var placeholder = el.getAttribute('placeholder');
+  const placeholder = el.getAttribute('placeholder');
+  let placeheld = true;
 
   bind();
   evaluate([delimiter], true);
@@ -96,8 +92,8 @@ function taggy (el, options) {
   }
 
   function addItem (data) {
-    var item = { data, valid: true };
-    var el = renderItem(item);
+    const item = { data, valid: true };
+    const el = renderItem(item);
     if (!el) {
       return api;
     }
@@ -135,12 +131,12 @@ function taggy (el, options) {
   }
 
   function createTag (buffer, item) {
-    var {data} = item;
-    var empty = typeof data === 'string' && data.trim().length === 0;
+    const {data} = item;
+    const empty = typeof data === 'string' && data.trim().length === 0;
     if (empty) {
       return null;
     }
-    let el = dom('span', 'tay-tag');
+    const el = dom('span', 'tay-tag');
     render(el, item);
     if (o.deletion) {
       el.appendChild(dom('span', 'tay-tag-remove'));
@@ -158,17 +154,16 @@ function taggy (el, options) {
   }
 
   function createAutocomplete () {
-    var config = o.autocomplete;
-    var prefix = config.prefix;
-    var cache = config.cache || {};
-    var noSource = !config.source;
+    const config = o.autocomplete;
+    const prefix = config.prefix;
+    const cache = config.cache || {};
+    const noSource = !config.source;
     if (noSource && !config.suggestions) {
       return;
     }
-    var req;
-    var limit = Number(config.limit) || Infinity;
-    var suggestions = noSource && config.suggestions || suggest;
-    var completer = autocomplete(el, {
+    const limit = Number(config.limit) || Infinity;
+    const suggestions = noSource && config.suggestions || suggest;
+    const completer = autocomplete(el, {
       suggestions,
       limit,
       getText,
@@ -190,31 +185,25 @@ function taggy (el, options) {
     });
     return completer;
     function suggest (q, done) {
-      var query = q.trim();
+      const query = q.trim();
       if (query.length === 0) {
         done([]); return;
       }
-      if (req) {
-        try {
-          req.abort();
-          req = null;
-        } catch (e) {
-        }
-      }
-      var hash = sum(query); // fast, case insensitive, prevents collisions
-      var entry = cache[hash];
+      api.emit('autocomplete.beforeSource');
+      const hash = sum(query); // fast, case insensitive, prevents collisions
+      const entry = cache[hash];
       if (entry) {
-        let start = entry.created.getTime();
-        let duration = cache.duration || 60 * 60 * 24;
-        let diff = duration * 1000;
-        let fresh = new Date(start + diff) > new Date();
+        const start = entry.created.getTime();
+        const duration = cache.duration || 60 * 60 * 24;
+        const diff = duration * 1000;
+        const fresh = new Date(start + diff) > new Date();
         if (fresh) {
           done(entry.items); return;
         }
       }
       config.source(query)
         .then(data => {
-          var items = Array.isArray(data) ? data : [];
+          const items = Array.isArray(data) ? data : [];
           cache[hash] = { created: new Date(), items };
           done(items);
         })
@@ -226,7 +215,7 @@ function taggy (el, options) {
   }
 
   function updatePlaceholder (e) {
-    var any = parent.querySelector('.tay-tag');
+    const any = parent.querySelector('.tay-tag');
     if (!any && !placeheld) {
       el.setAttribute('placeholder', placeholder);
       placeheld = true;
@@ -237,8 +226,8 @@ function taggy (el, options) {
   }
 
   function bind (remove) {
-    var op = remove ? 'remove' : 'add';
-    var ev = remove ? 'off' : 'on';
+    const op = remove ? 'remove' : 'add';
+    const ev = remove ? 'off' : 'on';
     crossvent[op](el, 'keydown', keydown);
     crossvent[op](el, 'keypress', keypress);
     crossvent[op](el, 'paste', paste);
@@ -281,14 +270,14 @@ function taggy (el, options) {
   }
 
   function click (e) {
-    var target = e.target;
+    const target = e.target;
     if (tagRemovalClass.test(target.className)) {
       focusTag(target.parentElement, { start: 'end', end: 'end', remove: true });
       shift();
       return;
     }
-    var top = target;
-    var tagged = tagClass.test(top.className);
+    let top = target;
+    let tagged = tagClass.test(top.className);
     while (tagged === false && top.parentElement) {
       top = top.parentElement;
       tagged = tagClass.test(top.className);
@@ -319,10 +308,10 @@ function taggy (el, options) {
   }
 
   function keydown (e) {
-    var sel = selection(el);
-    var key = e.which || e.keyCode || e.charCode;
-    var canMoveLeft = sel.start === 0 && sel.end === 0 && before.lastChild;
-    var canMoveRight = sel.start === el.value.length && sel.end === el.value.length && after.firstChild;
+    const sel = selection(el);
+    const key = e.which || e.keyCode || e.charCode;
+    const canMoveLeft = sel.start === 0 && sel.end === 0 && before.lastChild;
+    const canMoveRight = sel.start === el.value.length && sel.end === el.value.length && after.firstChild;
     if (free) {
       if (key === HOME) {
         if (before.firstChild) {
@@ -363,7 +352,7 @@ function taggy (el, options) {
   }
 
   function keypress (e) {
-    var key = e.which || e.keyCode || e.charCode;
+    const key = e.which || e.keyCode || e.charCode;
     if (String.fromCharCode(key) === delimiter) {
       convert();
       e.preventDefault();
@@ -376,15 +365,15 @@ function taggy (el, options) {
   }
 
   function evaluate (extras, entirely) {
-    var p = selection(el);
-    var len = entirely ? Infinity : p.start;
-    var tags = el.value.slice(0, len).concat(extras || []).split(delimiter);
+    const p = selection(el);
+    const len = entirely ? Infinity : p.start;
+    const tags = el.value.slice(0, len).concat(extras || []).split(delimiter);
     if (tags.length < 1 || !free) {
       return;
     }
 
-    var rest = tags.pop() + el.value.slice(len);
-    var removal = tags.join(delimiter).length;
+    const rest = tags.pop() + el.value.slice(len);
+    const removal = tags.join(delimiter).length;
 
     tags.forEach(tag => addItem(toItemData(tag)));
     cleanup();
@@ -396,7 +385,7 @@ function taggy (el, options) {
   }
 
   function cleanup () {
-    var tags = [];
+    const tags = [];
 
     each(before, detect);
     each(after, detect);
@@ -426,7 +415,7 @@ function taggy (el, options) {
       return;
     }
     evaluate([delimiter], true);
-    var parent = tag.parentElement;
+    const parent = tag.parentElement;
     if (parent === before) {
       while (parent.lastChild !== tag) {
         after.insertBefore(parent.lastChild, after.firstChild);
@@ -444,7 +433,7 @@ function taggy (el, options) {
   }
 
   function hasSiblings () {
-    var children = el.parentElement.children;
+    const children = el.parentElement.children;
     return [...children].some(s => s !== el && s.nodeType === ELEMENT);
   }
 

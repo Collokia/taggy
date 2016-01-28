@@ -115,6 +115,7 @@ Event | Arguments | Description
 `add` | `data`, `el` | Emitted whenever a new item is added to the list
 `remove` | `data` | Emitted whenever an item is removed from the list
 `invalid` | `data`, `el` | Emitted whenever an invalid item is added to the list
+`autocomplete.beforeSource` | none | Emitted before asking the autocomplete for a different source, useful to abort AJAX requests that are no longer necessary
 
 You can listen to these events using the following API.
 
