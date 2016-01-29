@@ -35,11 +35,10 @@ module.exports = function taggy (el, options) {
   if (any || !inputTag.test(el.tagName)) {
     throw new Error('taggy expected an input element without any siblings');
   }
-  let _noselect = document.activeElement !== el;
   const free = o.free !== false;
   const validate = o.validate || defaultValidate;
   const render = o.render || defaultRenderer;
-	const convertOnFocus = o.convertOnFocus !== false;
+	const convertOnBlur = o.convertOnBlur !== false;
 
   const toItemData = defaultToItemData;
 
@@ -78,8 +77,11 @@ module.exports = function taggy (el, options) {
   let placeheld = true;
 
   bind();
-  evaluate([delimiter], true);
-  _noselect = false;
+
+  (document.activeElement === el ?
+    evaluateSelect :
+    evaluateNoSelect
+  )([delimiter], true);
 
   return api;
 
@@ -233,8 +235,8 @@ module.exports = function taggy (el, options) {
     crossvent[op](el, 'keypress', keypress);
     crossvent[op](el, 'paste', paste);
     crossvent[op](parent, 'click', click);
-		if (convertOnFocus) {
-      crossvent[op](document.documentElement, 'focus', documentfocus, true);
+		if (convertOnBlur) {
+      crossvent[op](document.documentElement, 'blur', documentblur, true);
     }
     if (placeholder) {
       api[ev]('add', updatePlaceholder);
@@ -262,12 +264,11 @@ module.exports = function taggy (el, options) {
     return api;
   }
 
-  function documentfocus (e) {
+  function documentblur (e) {
     if (e.target !== el) {
-      _noselect = true;
-      convert(true);
-      _noselect = false;
+      return;
     }
+    convert(true);
   }
 
   function click (e) {
@@ -293,11 +294,11 @@ module.exports = function taggy (el, options) {
 
   function shift () {
     focusTag(after.lastChild, end);
-    evaluate([delimiter], true);
+    evaluateSelect([delimiter], true);
   }
 
   function convert (all) {
-    evaluate([delimiter], all);
+    (all ? evaluateNoSelect : evaluateSelect)([delimiter], all);
     if (all) {
       each(after, moveLeft);
     }
@@ -362,12 +363,19 @@ module.exports = function taggy (el, options) {
   }
 
   function paste () {
-    setTimeout(() => evaluate(), 0);
+    setTimeout(() => evaluateSelect(), 0);
   }
 
-  function evaluate (extras, entirely) {
-    const p = selection(el);
-    const len = entirely ? Infinity : p.start;
+  function evaluateNoSelect (extras, entirely) {
+    evaluateInternal(extras, entirely); // necessary for blur events, initialization, unfocused evaluation
+  }
+
+  function evaluateSelect (extras, entirely) {
+    evaluateInternal(extras, entirely, selection(el)); // only if we know the input has/should have focus
+  }
+
+  function evaluateInternal (extras, entirely, p) {
+    const len = entirely || !p ? Infinity : p.start;
     const tags = el.value.slice(0, len).concat(extras || []).split(delimiter);
     if (tags.length < 1 || !free) {
       return;
@@ -379,10 +387,16 @@ module.exports = function taggy (el, options) {
     tags.forEach(tag => addItem(toItemData(tag)));
     cleanup();
     el.value = rest;
-    p.start -= removal;
-    p.end -= removal;
-    if (_noselect !== true) { selection(el, p); }
+    reselect();
     shrinker.refresh();
+
+    function reselect () {
+      if (p) {
+        p.start -= removal;
+        p.end -= removal;
+        selection(el, p);
+      }
+    }
   }
 
   function cleanup () {
@@ -415,7 +429,7 @@ module.exports = function taggy (el, options) {
     if (!tag) {
       return;
     }
-    evaluate([delimiter], true);
+    evaluateSelect([delimiter], true);
     const parent = tag.parentElement;
     if (parent === before) {
       while (parent.lastChild !== tag) {
