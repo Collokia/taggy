@@ -393,7 +393,7 @@ export default function autocomplete (el, options) {
 
   function deferredShow (e) {
     const which = e.which || e.keyCode;
-    if (which === KEY_ENTER) {
+    if (which === KEY_ENTER || which === KEY_TAB) {
       return;
     }
     setTimeout(show, 0);
