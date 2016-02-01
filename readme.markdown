@@ -58,9 +58,9 @@ When you have complex data items from autocomplete, you need to set `parseText` 
 
 Expects an object that defines how the autocomplete list is configured. Autocomplete options are listed below.
 
-> ### `prefix(text)`
+> ### `prefix(text, previousSuggestions)`
 >
-> Runs when a tag is inserted. The returned string is used to pre-fill the text input. Useful to avoid repetitive prefixes.
+> Runs when a tag is inserted. The returned string is used to pre-fill the text input. Useful to avoid repetitive prefixes. The `previousSuggestions` list can be used to choose a prefix based on the previous list of suggestions.
 >
 > ### `cache`
 >

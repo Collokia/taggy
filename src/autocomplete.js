@@ -105,8 +105,8 @@ export default function autocomplete (el, options) {
 
   function loaded (suggestions, forceShow) {
     clear();
+    api.suggestions = [];
     suggestions.forEach(add);
-    api.suggestions = suggestions;
     if (forceShow) {
       show();
     }
@@ -141,7 +141,7 @@ export default function autocomplete (el, options) {
       set(value);
       hide();
       attachment.focus();
-      const prefix = o.prefix && o.prefix(input);
+      const prefix = o.prefix && o.prefix(input, api.suggestions.slice());
       if (prefix) {
         el.value = prefix;
         el.select();
