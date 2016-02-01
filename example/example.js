@@ -21,17 +21,26 @@ void function () {
   taggy($('#sourced'), {
     autocomplete: {
       source: function (data) {
-        console.log(data);
         return new Promise((resolve, reject) => {
           setTimeout(function () {
             resolve([
               'apples', 'bananas', 'carrots', 'peanuts', 'lettuce'
             ])
-          }, 3000);
+          }, 500);
         });
       }
-    },
-    free: false
+    }
+  });
+
+  taggy($('#random'), {
+    autocomplete: {
+      source: function (data) {
+        return Promise.resolve(Array
+          .apply(null, { length: 10 })
+          .map(x => Math.random().toString().slice(2))
+        );
+      }
+    }
   });
 
   taggy($('#free'), {});
