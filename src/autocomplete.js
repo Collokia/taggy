@@ -128,12 +128,17 @@ export default function autocomplete (el, options) {
     let li = tag('li', 'tac-item');
     render(li, suggestion);
     breakupForHighlighter(li);
+    crossvent.add(li, 'mouseenter', hoverSuggestion);
     crossvent.add(li, 'click', clickedSuggestion);
     crossvent.add(li, 'autocomplete-filter', filterItem);
     crossvent.add(li, 'autocomplete-hide', hideItem);
     ul.appendChild(li);
     api.suggestions.push(suggestion);
     return li;
+
+    function hoverSuggestion () {
+      select(suggestion);
+    }
 
     function clickedSuggestion () {
       const input = getText(suggestion);
