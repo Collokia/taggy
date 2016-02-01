@@ -2,6 +2,9 @@
   padding: 10px;
   cursor: text;
 }
+.tay-tags-before {
+  margin-left: -5px;
+}
 .tay-tag {
   display: inline-block;
   border: 1px solid #666;
@@ -16,7 +19,7 @@
   cursor: pointer;
 }
 .tay-input {
-  padding: 3px;
+  padding: 3px 3px 3px 8px;
   margin: 5px 0;
 }
 .tay-input[placeholder] {
