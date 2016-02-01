@@ -11,7 +11,7 @@ void function () {
         { tagId: 'dev:jvm', descriptionText: 'dev-jvm', taxonomy: 'other' }
       ],
       prefix (fullText) {
-        return fullText.split('-')[0];
+        return 'dev-';
       }
     },
     parseText: 'descriptionText',
