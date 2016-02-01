@@ -23,7 +23,7 @@ export default function autocomplete (el, options) {
   const userSet = o.set || defaultSetter;
   const ul = tag('ul', 'tac-list');
   const deferredFiltering = defer(filtering);
-  const state = { counter: 0, value: null };
+  const state = { counter: 0, query: null };
   let selection = null;
   let eye;
   let attachment = el;
@@ -88,13 +88,13 @@ export default function autocomplete (el, options) {
   function loading (forceShow) {
     if (typeof suggestions === 'function') {
       crossvent.remove(attachment, 'focus', loading);
-      const value = readInput();
-      if (value !== state.value) {
+      const query = readInput();
+      if (query !== state.query) {
         state.counter++;
-        state.value = value;
+        state.query = query;
 
         const counter = state.counter;
-        suggestions(value, function (s) {
+        suggestions({ query, limit }, function (s) {
           if (state.counter === counter) {
             loaded(s, forceShow);
           }

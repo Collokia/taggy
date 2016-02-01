@@ -165,7 +165,8 @@ module.exports = function taggy (el, options) {
       return;
     }
     const limit = Number(config.limit) || Infinity;
-    const suggestions = noSource && config.suggestions || suggest;
+    const staticItems = Array.isArray(config.suggestions) ? config.suggestions.slice() : [];
+    const suggestions = noSource ? staticItems : suggest;
     const completer = autocomplete(el, {
       suggestions,
       limit,
@@ -187,8 +188,8 @@ module.exports = function taggy (el, options) {
       }
     });
     return completer;
-    function suggest (q, done) {
-      const query = q.trim();
+    function suggest (data, done) {
+      const query = data.query.trim();
       if (query.length === 0) {
         done([]); return;
       }
@@ -204,9 +205,9 @@ module.exports = function taggy (el, options) {
           done(entry.items); return;
         }
       }
-      config.source(query)
-        .then(data => {
-          const items = Array.isArray(data) ? data : [];
+      config.source(data)
+        .then(result => {
+          const items = Array.isArray(result) ? result : [];
           cache[hash] = { created: new Date(), items };
           done(items);
         })
