@@ -31,6 +31,7 @@ export default function autocomplete (el, options) {
   let anyInput;
   let ranchorleft;
   let ranchorright;
+  let lastPrefix = '';
 
   if (o.autoHideOnBlur === void 0) { o.autoHideOnBlur = true; }
   if (o.autoHideOnClick === void 0) { o.autoHideOnClick = true; }
@@ -146,9 +147,9 @@ export default function autocomplete (el, options) {
       set(value);
       hide();
       attachment.focus();
-      const prefix = o.prefix && o.prefix(input, api.suggestions.slice());
-      if (prefix) {
-        el.value = prefix;
+      lastPrefix = o.prefix && o.prefix(input, api.suggestions.slice()) || '';
+      if (lastPrefix) {
+        el.value = lastPrefix;
         el.select();
         show();
         filtering();
@@ -314,6 +315,9 @@ export default function autocomplete (el, options) {
     ul.className = ul.className.replace(/ tac-show/g, '');
     unselect();
     crossvent.fabricate(attachment, 'autocomplete-hide');
+    if (el.value === lastPrefix) {
+      el.value = '';
+    }
   }
 
   function keydown (e) {
