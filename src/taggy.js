@@ -159,6 +159,7 @@ module.exports = function taggy (el, options) {
   function createAutocomplete () {
     const config = o.autocomplete;
     const prefix = config.prefix;
+    const caching = config.cache !== false;
     const cache = config.cache || {};
     const noSource = !config.source;
     if (noSource && !config.suggestions) {
@@ -196,20 +197,24 @@ module.exports = function taggy (el, options) {
       }
       api.emit('autocomplete.beforeSource');
       const hash = sum(query); // fast, case insensitive, prevents collisions
-      const entry = cache[hash];
-      if (entry) {
-        const start = entry.created.getTime();
-        const duration = cache.duration || 60 * 60 * 24;
-        const diff = duration * 1000;
-        const fresh = new Date(start + diff) > new Date();
-        if (fresh) {
-          done(entry.items); return;
+      if (caching) {
+        const entry = cache[hash];
+        if (entry) {
+          const start = entry.created.getTime();
+          const duration = cache.duration || 60 * 60 * 24;
+          const diff = duration * 1000;
+          const fresh = new Date(start + diff) > new Date();
+          if (fresh) {
+            done(entry.items); return;
+          }
         }
       }
       config.source(data)
         .then(result => {
           const items = Array.isArray(result) ? result : [];
-          cache[hash] = { created: new Date(), items };
+          if (caching) {
+            cache[hash] = { created: new Date(), items };
+          }
           done(items);
         })
         .catch(error => {

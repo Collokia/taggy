@@ -66,6 +66,8 @@ Expects an object that defines how the autocomplete list is configured. Autocomp
 >
 > Can be an object that will be used to store queries and suggestions. You can provide a `cache.duration` as well, which defaults to one day and is specified in seconds. The `cache.duration` is used to figure out whether cache entries are fresh or stale.
 >
+> You can disable autocomplete caching by setting `cache` to `false`.
+>
 > ### `limit`
 >
 > Can be a number that determines the maximum amount of suggestions shown in the autocomplete list.
