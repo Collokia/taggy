@@ -27,6 +27,7 @@
     "fuzzysearch": "1.0.3",
     "hash-sum": "1.0.2",
     "horsey": "3.0.0",
+    "lodash": "4.1.0",
     "sell": "1.0.0"
   },
   "devDependencies": {

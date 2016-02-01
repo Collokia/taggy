@@ -18,5 +18,21 @@ void function () {
     free: false
   });
 
+  taggy($('#sourced'), {
+    autocomplete: {
+      source: function (data) {
+        console.log(data);
+        return new Promise((resolve, reject) => {
+          setTimeout(function () {
+            resolve([
+              'apples', 'bananas', 'carrots', 'peanuts', 'lettuce'
+            ])
+          }, 3000);
+        });
+      }
+    },
+    free: false
+  });
+
   taggy($('#free'), {});
 }();

@@ -88,6 +88,10 @@ Expects an object that defines how the autocomplete list is configured. Autocomp
 >
 > - `data.query` is a query for which suggestions should be provided
 > - `data.limit` is the previously specified `options.limit`
+>
+> ### `debounce`
+>
+> The minimum amount of milliseconds that should ellapse between two different calls to `source`. Useful to allow users to type text without firing dozens of queries. Defaults to `300`.
 
 ## `validate(value, tags)`
 

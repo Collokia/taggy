@@ -173,6 +173,7 @@ module.exports = function taggy (el, options) {
       getText,
       getValue,
       prefix,
+      debounce: config.debounce,
       set (s) {
         el.value = '';
         addItem(s);

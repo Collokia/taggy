@@ -1,9 +1,10 @@
 'use strict';
 
 import sell from 'sell';
-import crossvent from 'crossvent';
 import bullseye from 'bullseye';
+import crossvent from 'crossvent';
 import fuzzysearch from 'fuzzysearch';
+import debounce from 'lodash/debounce';
 const KEY_BACKSPACE = 8;
 const KEY_ENTER = 13;
 const KEY_ESC = 27;
@@ -32,6 +33,8 @@ export default function autocomplete (el, options) {
   let ranchorleft;
   let ranchorright;
   let lastPrefix = '';
+  const debounceTime = o.debounce || 300;
+  const debouncedLoading = debounce(loading, debounceTime);
 
   if (o.autoHideOnBlur === void 0) { o.autoHideOnBlur = true; }
   if (o.autoHideOnClick === void 0) { o.autoHideOnClick = true; }
@@ -367,7 +370,7 @@ export default function autocomplete (el, options) {
     if (!visible()) {
       return;
     }
-    loading(true);
+    debouncedLoading(true);
     crossvent.fabricate(attachment, 'autocomplete-filter');
     const value = readInput().trim();
     let li = ul.firstChild;
