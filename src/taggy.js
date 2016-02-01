@@ -421,7 +421,6 @@ module.exports = function taggy (el, options) {
     const removal = tags.join(delimiter).length;
 
     tags.forEach(tag => addItem(toItemData(tag)));
-    // cleanup();
     el.value = rest;
     reselect();
     shrinker.refresh();
@@ -431,25 +430,6 @@ module.exports = function taggy (el, options) {
         p.start -= removal;
         p.end -= removal;
         selection(el, p);
-      }
-    }
-  }
-
-  function cleanup () {
-    const tags = [];
-
-    each(before, detect);
-    each(after, detect);
-
-    function detect (value, tagElement) {
-      if (validate(value, tags.slice())) {
-        tagElement.classList.add('tay-valid');
-        tags.push(value);
-      } else if (o.preventInvalid) {
-        tagElement.parentElement.removeChild(tagElement);
-      } else {
-        tagElement.classList.add('tay-invalid');
-        api.emit('invalid', value, tagElement);
       }
     }
   }
@@ -477,8 +457,9 @@ module.exports = function taggy (el, options) {
         before.appendChild(parent.firstChild);
       }
     }
-    tag.parentElement.removeChild(tag);
-    el.value = p.remove ? '' : readTag(tag);
+    const value = p.remove ? '' : readTag(tag);
+    removeItemByElement(tag);
+    el.value = value;
     el.focus();
     selection(el, p);
     shrinker.refresh();

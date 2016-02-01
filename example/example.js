@@ -47,5 +47,6 @@ void function () {
       }
     }),
 
+    taggy($('#invalid'))
   ];
 }();
