@@ -123,7 +123,7 @@ Adds an item to the input. The `data` parameter could be a string or a complex o
 
 Finds an item by its `data` string or object.
 
-## `.findItemByElement(data)`
+## `.findItemByElement(el)`
 
 Finds an item by its `.tay-tag` DOM element.
 
@@ -131,7 +131,7 @@ Finds an item by its `.tay-tag` DOM element.
 
 Removes an item from the input. The item is found using the `data` string or object.
 
-## `.removeItemByElement(data)`
+## `.removeItemByElement(el)`
 
 Removes an item from the input. The item is found using a `.tay-tag` DOM element.
 
