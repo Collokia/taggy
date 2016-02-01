@@ -42,13 +42,13 @@ The separator between tags. Defaults to `' '`. Must be a single character.
 
 This option will prevent tags identified as invalid from being added. By default this is turned off and they just get a `tay-invalid` CSS class.
 
-## `validate(value, tags)`
+## `validate(value)`
 
-A method that validates whether the user input `value` constitutes a valid tag, taking into account the currently valid `tags`. Useful to filter out duplicates. Defaults to the method below.
+A method that validates whether the user input `value` constitutes a valid tag. Useful to filter out duplicates. Defaults to the method below, that does exactly that. Note that in the code below, `toy` is the API returned by calling `taggy(el)`.
 
 ```js
-function validate (value, tags) {
-  return tags.indexOf(value) === -1;
+function validate (value) {
+  return toy.findItem(value) === null;
 }
 ```
 
@@ -119,6 +119,14 @@ When you call `taggy(input, options)`, you'll get back a tiny API to interact wi
 
 Adds an item to the input. The `data` parameter could be a string or a complex object, depending on your instance configuration.
 
+## `.findItem(data)`
+
+Finds an item by its `data` string or object.
+
+## `.findItemByElement(data)`
+
+Finds an item by its `.tay-tag` DOM element.
+
 ## `.removeItem(data)`
 
 Removes an item from the input. The item is found using the `data` string or object.
@@ -149,12 +157,12 @@ Event | Arguments | Description
 You can listen to these events using the following API.
 
 ```js
-var input = taggy(el);
-input.on('add', data => console.log(data)); // listen to an event
-input.once('invalid', data => throw new Error('invalid data')); // listener discarded after one execution
+const toy = taggy(el);
+toy.on('add', data => console.log(data)); // listen to an event
+toy.once('invalid', data => throw new Error('invalid data')); // listener discarded after one execution
 
-input.on('foo', bar);
-input.off('foo', bar); // removes listener
+toy.on('foo', bar);
+toy.off('foo', bar); // removes listener
 
 function bar () {}
 ```

@@ -67,6 +67,8 @@ module.exports = function taggy (el, options) {
   const completer = o.autocomplete ? createAutocomplete() : null;
   const api = emitter({
     addItem,
+    findItem: data => findItem(data),
+    findItemByElement: el => findItem(el, 'el'),
     removeItem: removeItemByData,
     removeItemByElement,
     value: readValue,
@@ -95,7 +97,11 @@ module.exports = function taggy (el, options) {
   }
 
   function addItem (data) {
-    const item = { data, valid: true };
+    const valid = validate(data);
+    const item = { data, valid };
+    if (o.preventInvalid) {
+      return api;
+    }
     const el = renderItem(item);
     if (!el) {
       return api;
@@ -103,16 +109,38 @@ module.exports = function taggy (el, options) {
     item.el = el;
     currentValues.push(item);
     api.emit('add', data, el);
+    invalidate();
     return api;
   }
 
   function removeItem (item) {
-    if (item) {
-      removeItemElement(item.el);
-      currentValues.splice(currentValues.indexOf(item), 1);
-      api.emit('remove', item.data);
+    if (!item) {
+      return api;
     }
+    removeItemElement(item.el);
+    currentValues.splice(currentValues.indexOf(item), 1);
+    api.emit('remove', item.data);
+    invalidate();
     return api;
+  }
+
+  function invalidate () {
+    currentValues.slice().forEach((v,i) => {
+      currentValues.splice(i, 1);
+
+      const valid = validate(v.data);
+      if (valid) {
+        v.el.classList.add('tay-valid');
+        v.el.classList.remove('tay-invalid');
+      } else {
+        v.el.classList.add('tay-invalid');
+        v.el.classList.remove('tay-valid');
+        api.emit('invalid', v.data, v.el);
+      }
+      v.valid = valid;
+
+      currentValues.splice(i, 0, v);
+    });
   }
 
   function removeItemByData (data) {
@@ -209,7 +237,8 @@ module.exports = function taggy (el, options) {
           }
         }
       }
-      config.source(data)
+      config
+        .source(data)
         .then(result => {
           const items = Array.isArray(result) ? result : [];
           if (caching) {
@@ -392,7 +421,7 @@ module.exports = function taggy (el, options) {
     const removal = tags.join(delimiter).length;
 
     tags.forEach(tag => addItem(toItemData(tag)));
-    cleanup();
+    // cleanup();
     el.value = rest;
     reselect();
     shrinker.refresh();
@@ -414,6 +443,7 @@ module.exports = function taggy (el, options) {
 
     function detect (value, tagElement) {
       if (validate(value, tags.slice())) {
+        tagElement.classList.add('tay-valid');
         tags.push(value);
       } else if (o.preventInvalid) {
         tagElement.parentElement.removeChild(tagElement);
@@ -463,7 +493,7 @@ module.exports = function taggy (el, options) {
     [...container.children].forEach((tag, i) => fn(readTag(tag), tag, i));
   }
 
-  function defaultValidate (value, tags) {
-    return tags.indexOf(value) === -1;
+  function defaultValidate (value) {
+    return findItem(value) === null;
   }
 }
