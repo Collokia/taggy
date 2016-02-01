@@ -42,6 +42,18 @@ The separator between tags. Defaults to `' '`. Must be a single character.
 
 This option will prevent tags identified as invalid from being added. By default this is turned off and they just get a `tay-invalid` CSS class.
 
+## `validate(value, tags)`
+
+A method that validates whether the user input `value` constitutes a valid tag, taking into account the currently valid `tags`. Useful to filter out duplicates. Defaults to the method below.
+
+```js
+function validate (value, tags) {
+  return tags.indexOf(value) === -1;
+}
+```
+
+Note that `tags` is only a copy and modifying it won't affect the list of tags.
+
 ## `render(container, item)`
 
 A method that's called whenever a tag should be rendered. Defaults to setting `getText(item)` as the container's text.
@@ -94,18 +106,6 @@ Expects an object that defines how the autocomplete list is configured. Autocomp
 > ### `debounce`
 >
 > The minimum amount of milliseconds that should ellapse between two different calls to `source`. Useful to allow users to type text without firing dozens of queries. Defaults to `300`.
-
-## `validate(value, tags)`
-
-A method that validates whether the user input `value` constitutes a valid tag, taking into account the currently valid `tags`. Useful to filter out duplicates. Defaults to the method below.
-
-```js
-function validate (value, tags) {
-  return tags.indexOf(value) === -1;
-}
-```
-
-Note that `tags` is only a copy and modifying it won't affect the list of tags.
 
 ## `convertOnBlur`
 
