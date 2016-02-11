@@ -52,7 +52,7 @@ module.exports = function taggy (el, options) {
   const getValue = (
     typeof parseValue === 'string' ? d => d[parseValue] :
     typeof parseValue === 'function' ? parseValue :
-    d => d.toString()
+    d => d
   );
 
   const before = dom('span', 'tay-tags tay-tags-before');
