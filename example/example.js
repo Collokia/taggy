@@ -19,6 +19,7 @@ void function () {
         }
       },
       parseText: 'descriptionText',
+      parseValue: 'descriptionText',
       free: false
     }),
 

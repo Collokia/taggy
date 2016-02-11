@@ -146,8 +146,7 @@ export default function autocomplete (el, options) {
 
     function clickedSuggestion () {
       const input = getText(suggestion);
-      const value = getValue(suggestion);
-      set(value);
+      set(suggestion);
       hide();
       attachment.focus();
       lastPrefix = o.prefix && o.prefix(input, api.suggestions.slice()) || '';
