@@ -189,13 +189,11 @@ module.exports = function taggy (el, options) {
     const prefix = config.prefix;
     const caching = config.cache !== false;
     const cache = config.cache || {};
-    const noSource = !config.source;
-    if (noSource && !config.suggestions) {
+    const source = config.suggestions || () => Promise.resolve([]);
+    if (source) {
       return;
     }
     const limit = Number(config.limit) || Infinity;
-    const staticItems = Array.isArray(config.suggestions) ? config.suggestions.slice() : [];
-    const suggestions = noSource ? staticItems : suggest;
     const completer = autocomplete(el, {
       suggestions,
       limit,
@@ -238,7 +236,7 @@ module.exports = function taggy (el, options) {
         }
       }
       config
-        .source(data)
+        .suggestions(data)
         .then(result => {
           const items = Array.isArray(result) ? result : [];
           if (caching) {

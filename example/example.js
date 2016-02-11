@@ -9,11 +9,13 @@ void function () {
 
     taggy($('#fixed'), {
       autocomplete: {
-        suggestions: [
-          { tagId: 'dev:android', descriptionText: 'dev-android', taxonomy: 'devWorld' },
-          { tagId: 'dev:java', descriptionText: 'dev-java', taxonomy: 'langs' },
-          { tagId: 'dev:jvm', descriptionText: 'dev-jvm', taxonomy: 'other' }
-        ],
+        suggestions: function (data) {
+          return Promise.resolve([
+            { tagId: 'dev:android', descriptionText: 'dev-android', taxonomy: 'devWorld' },
+            { tagId: 'dev:java', descriptionText: 'dev-java', taxonomy: 'langs' },
+            { tagId: 'dev:jvm', descriptionText: 'dev-jvm', taxonomy: 'other' }
+          ]);
+        },
         prefix (fullText) {
           return 'dev-';
         }
@@ -25,7 +27,7 @@ void function () {
 
     taggy($('#sourced'), {
       autocomplete: {
-        source: function (data) {
+        suggestions: function (data) {
           return new Promise((resolve, reject) => {
             setTimeout(function () {
               resolve([
@@ -39,7 +41,7 @@ void function () {
 
     taggy($('#random'), {
       autocomplete: {
-        source: function (data) {
+        suggestions: function (data) {
           return Promise.resolve(Array
             .apply(null, { length: 10 })
             .map(x => Math.random().toString().slice(2))
