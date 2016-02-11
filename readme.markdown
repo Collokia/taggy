@@ -94,11 +94,7 @@ Expects an object that defines how the autocomplete list is configured. Autocomp
 >
 > ### `suggestions`
 >
-> A list of suggestions for the autocomplete list. Note that it _can't change over time_.
->
-> ### `source`
->
-> An alternative to `suggestions` that **can change over time**. `source(data)` should be a function that returns a promise. The promise should fulfill to an array of autocomplete suggestion objects for the provided `data.query`.
+> A `suggestions(data)` should be set to a function that returns a promise. The promise should fulfill to an array of autocomplete suggestion objects for the provided `data.query`.
 >
 > - `data.query` is a query for which suggestions should be provided
 > - `data.limit` is the previously specified `options.limit`
