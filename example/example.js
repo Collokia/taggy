@@ -9,6 +9,7 @@ void function () {
 
     taggy($('#fixed'), {
       autocomplete: {
+        noMatches: 'No results found.',
         suggestions: function (data) {
           return Promise.resolve([
             { tagId: 'dev:android', descriptionText: 'dev-android', taxonomy: 'devWorld' },
@@ -27,6 +28,7 @@ void function () {
 
     taggy($('#sourced'), {
       autocomplete: {
+        noMatches: 'No results found.',
         suggestions: function (data) {
           return new Promise((resolve, reject) => {
             setTimeout(function () {
@@ -41,6 +43,7 @@ void function () {
 
     taggy($('#random'), {
       autocomplete: {
+        noMatches: 'No results found.',
         suggestions: function (data) {
           return Promise.resolve(Array
             .apply(null, { length: 10 })

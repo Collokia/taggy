@@ -18,16 +18,18 @@ export default function autocomplete (el, options) {
   const o = options || {};
   const parent = o.appendTo || doc.body;
   const render = o.render || defaultRenderer;
-  const {getText, getValue, form, suggestions} = o;
+  const {getText, getValue, form, suggestions, noMatches, noMatchesText} = o;
   const limit = typeof o.limit === 'number' ? o.limit : Infinity;
   const userFilter = o.filter || defaultFilter;
   const userSet = o.set || defaultSetter;
   const ul = tag('ul', 'tac-list');
+  const container = tag('div', 'tac-container');
   const deferredFiltering = defer(filtering);
   const state = { counter: 0, query: null };
   let selection = null;
   let eye;
   let attachment = el;
+  let noneMatch;
   let textInput;
   let anyInput;
   let ranchorleft;
@@ -63,12 +65,17 @@ export default function autocomplete (el, options) {
     defaultSetter,
     retarget,
     attachment,
-    list: ul,
     suggestions: []
   };
 
   retarget(el);
-  parent.appendChild(ul);
+  container.appendChild(ul);
+  if (noMatches && noMatchesText) {
+    noneMatch = tag('div', 'tac-empty tac-hide');
+    text(noneMatch, noMatchesText);
+    container.appendChild(noneMatch);
+  }
+  parent.appendChild(container);
   el.setAttribute('autocomplete', 'off');
 
   if (Array.isArray(suggestions)) {
@@ -125,11 +132,11 @@ export default function autocomplete (el, options) {
   }
 
   function readInput () {
-    return textInput ? el.value : el.innerHTML;
+    return (textInput ? el.value : el.innerHTML).trim();
   }
 
   function add (suggestion) {
-    let li = tag('li', 'tac-item');
+    const li = tag('li', 'tac-item');
     render(li, suggestion);
     breakupForHighlighter(li);
     crossvent.add(li, 'mouseenter', hoverSuggestion);
@@ -250,12 +257,12 @@ export default function autocomplete (el, options) {
   }
 
   function isText () { return isInput(attachment); }
-  function visible () { return ul.className.indexOf('tac-show') !== -1; }
+  function visible () { return container.className.indexOf('tac-show') !== -1; }
   function hidden (li) { return li.className.indexOf('tac-hide') !== -1; }
 
   function show () {
     if (!visible()) {
-      ul.className += ' tac-show';
+      container.className += ' tac-show';
       eye.refresh();
       crossvent.fabricate(attachment, 'autocomplete-show');
     }
@@ -314,7 +321,7 @@ export default function autocomplete (el, options) {
 
   function hide () {
     eye.sleep();
-    ul.className = ul.className.replace(/ tac-show/g, '');
+    container.className = container.className.replace(/ tac-show/g, '');
     unselect();
     crossvent.fabricate(attachment, 'autocomplete-hide');
     if (el.value === lastPrefix) {
@@ -371,7 +378,7 @@ export default function autocomplete (el, options) {
     }
     debouncedLoading(true);
     crossvent.fabricate(attachment, 'autocomplete-filter');
-    const value = readInput().trim();
+    const value = readInput();
     let li = ul.firstChild;
     let count = 0;
     while (li) {
@@ -386,10 +393,16 @@ export default function autocomplete (el, options) {
       }
       li = li.nextSibling;
     }
+    const nomatch = noMatches({ query: value });
+    if (count === 0 && nomatch) {
+      noneMatch.classList.remove('tac-hide');
+    } else {
+      noneMatch.classList.add('tac-hide');
+    }
     if (!selection) {
       move();
     }
-    if (!selection) {
+    if (!selection && !nomatch) {
       hide();
     }
   }
@@ -416,7 +429,7 @@ export default function autocomplete (el, options) {
       return true;
     }
     while (target) {
-      if (target === ul || target === attachment) {
+      if (target === container || target === attachment) {
         return true;
       }
       target = target.parentNode;
@@ -444,7 +457,7 @@ export default function autocomplete (el, options) {
       eye = null;
     }
     if (!remove) {
-      eye = bullseye(ul, attachment, { caret: anyInput && attachment.tagName !== 'INPUT' });
+      eye = bullseye(container, attachment, { caret: anyInput && attachment.tagName !== 'INPUT' });
       if (!visible()) { eye.sleep(); }
     }
     if (remove || (anyInput && doc.activeElement !== attachment)) {
@@ -469,7 +482,7 @@ export default function autocomplete (el, options) {
 
   function destroy () {
     inputEvents(true);
-    if (parent.contains(ul)) { parent.removeChild(ul); }
+    if (parent.contains(container)) { parent.removeChild(container); }
   }
 
   function defaultSetter (value) {
@@ -481,7 +494,7 @@ export default function autocomplete (el, options) {
   }
 
   function defaultRenderer (li, suggestion) {
-    li.innerText = li.textContent = getText(suggestion);
+    text(li, getText(suggestion));
   }
 
   function defaultFilter (q, suggestion) {
@@ -550,6 +563,7 @@ function tag (type, className) {
 }
 
 function defer (fn) { return function () { setTimeout(fn, 0); }; }
+function text (el, value) { el.innerText = el.textContent = value; }
 
 function isEditable (el) {
   const value = el.getAttribute('contentEditable');

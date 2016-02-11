@@ -28,12 +28,9 @@
 .tay-input[placeholder] {
   min-width: 100%;
 }
-.tac-list {
+.tac-container {
   display: none;
   position: absolute;
-  padding: 0;
-  margin: 0;
-  list-style-type: none;
   -webkit-box-shadow: 1px 2px 6px;
   box-shadow: 1px 2px 6px;
   background-color: #fff;
@@ -44,11 +41,20 @@
   -ms-transition: left 0.1s ease-in-out;
   transition: left 0.1s ease-in-out;
 }
+.tac-list {
+  padding: 0;
+  margin: 0;
+  list-style-type: none;
+}
 .tac-show {
   display: block;
 }
 .tac-hide {
   display: none;
+}
+.tac-empty {
+  cursor: default;
+  padding: 7px;
 }
 .tac-item {
   cursor: pointer;

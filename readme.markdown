@@ -103,6 +103,10 @@ Expects an object that defines how the autocomplete list is configured. Autocomp
 >
 > When this option is set to `true`, the `suggestions(data)` function will be called even when the `query` string is empty.
 >
+> ### `noMatches`
+>
+> Defaults to `null`. Set to a string if you want to display an informational message when no suggestions match the provided `query` string. Note that this message won't be displayed when `query` is empty even if `blankSearch` is turned on.
+>
 > ### `debounce`
 >
 > The minimum amount of milliseconds that should ellapse between two different calls to `suggestions`. Useful to allow users to type text without firing dozens of queries. Defaults to `300`.

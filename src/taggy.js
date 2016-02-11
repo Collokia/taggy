@@ -189,8 +189,8 @@ module.exports = function taggy (el, options) {
     const prefix = config.prefix;
     const caching = config.cache !== false;
     const cache = config.cache || {};
-    const source = config.suggestions || () => Promise.resolve([]);
-    if (source) {
+    const source = config.suggestions;
+    if (!source) {
       return;
     }
     const limit = Number(config.limit) || Infinity;
@@ -200,6 +200,8 @@ module.exports = function taggy (el, options) {
       getText,
       getValue,
       prefix,
+      noMatches,
+      noMatchesText: config.noMatches,
       debounce: config.debounce,
       set (s) {
         el.value = '';
@@ -216,8 +218,14 @@ module.exports = function taggy (el, options) {
       }
     });
     return completer;
-    function suggest (data, done) {
-      const query = data.query.trim();
+    function noMatches (data) {
+      if (!config.noMatches) {
+        return false;
+      }
+      return data.query.length;
+    }
+    function suggestions (data, done) {
+      const {query} = data;
       if (!config.blankSearch && query.length === 0) {
         done([]); return;
       }
