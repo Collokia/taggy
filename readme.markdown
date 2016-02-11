@@ -99,6 +99,10 @@ Expects an object that defines how the autocomplete list is configured. Autocomp
 > - `data.query` is a query for which suggestions should be provided
 > - `data.limit` is the previously specified `options.limit`
 >
+> ### `blankSearch`
+>
+> When this option is set to `true`, the `suggestions(data)` function will be called even when the `query` string is empty.
+>
 > ### `debounce`
 >
 > The minimum amount of milliseconds that should ellapse between two different calls to `suggestions`. Useful to allow users to type text without firing dozens of queries. Defaults to `300`.

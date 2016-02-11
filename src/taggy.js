@@ -218,10 +218,10 @@ module.exports = function taggy (el, options) {
     return completer;
     function suggest (data, done) {
       const query = data.query.trim();
-      if (query.length === 0) {
+      if (!config.blankSearch && query.length === 0) {
         done([]); return;
       }
-      api.emit('autocomplete.beforeSource');
+      api.emit('autocomplete.beforeUpdate');
       const hash = sum(query); // fast, case insensitive, prevents collisions
       if (caching) {
         const entry = cache[hash];
@@ -245,7 +245,7 @@ module.exports = function taggy (el, options) {
           done(items);
         })
         .catch(error => {
-          console.log('Autocomplete source promise rejected', error, el);
+          console.log('Autocomplete suggestions promise rejected', error, el);
           done([]);
         });
     }
