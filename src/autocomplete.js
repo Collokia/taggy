@@ -139,13 +139,13 @@ export default function autocomplete (el, options) {
   }
 
   function getCategory (data) {
-    if (!data.title) {
-      data.title = 'default';
+    if (!data.id) {
+      data.id = 'default';
     }
-    if (!categoryMap[data.title]) {
-      categoryMap[data.title] = createCategory();
+    if (!categoryMap[data.id]) {
+      categoryMap[data.id] = createCategory();
     }
-    return categoryMap[data.title];
+    return categoryMap[data.id];
     function createCategory () {
       const category = tag('div', 'tac-category');
       const ul = tag('ul', 'tac-list');
@@ -619,10 +619,10 @@ export default function autocomplete (el, options) {
   }
 
   function defaultCategoryRenderer (div, data) {
-    if (data.title !== 'default') {
-      const title = tag('div', 'tac-category-title');
-      div.appendChild(title);
-      text(title, data.title);
+    if (data.id !== 'default') {
+      const id = tag('div', 'tac-category-id');
+      div.appendChild(id);
+      text(id, data.id);
     }
   }
 

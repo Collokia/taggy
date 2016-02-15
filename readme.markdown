@@ -98,13 +98,28 @@ Expects an object that defines how the autocomplete list is configured. Autocomp
 >
 > ### `suggestions`
 >
-> A `suggestions(data)` should be set to a function that returns a promise. The promise should fulfill to an array of autocomplete suggestion objects for the provided `data.input`.
+> A `suggestions(data)` should be set to a function that returns a promise. The promise should fulfill to the result for the provided `data.input`.
 >
 > - `data.input` is a query for which suggestions should be provided
 > - `data.limit` is the previously specified `options.limit`
 > - `data.values` are the currently selected values
 > - `data.previousSelection` is the last suggestion selected by the user
 > - `data.previousSuggestions` is the last list of suggestions provided to the user
+>
+> The expected schema for the promise's fulfillment result is outlined below.
+>
+> ```js
+> [category1, category2, category3]
+> ```
+>
+> Each category is expected to follow the next schema. The `id` is optional, all category objects without an `id` will be treated as if their `id` was `'default'`. Note that categories under the same `id` will be merged together when displaying the autocomplete suggestions.
+>
+> ```js
+> {
+>   id: 'here is some category',
+>   list: [item1, item2, item3]
+> }
+> ```
 >
 > ### `blankSearch`
 >
@@ -126,6 +141,13 @@ Expects an object that defines how the autocomplete list is configured. Autocomp
 >
 > If set to `false`, autocomplete suggestions won't be highlighted as whole words first. The highlighter will be faster but the UX won't be as close to user expectations.
 >
+> ### `renderItem`
+>
+> By default, items are rendered using the text for a `suggestion`. You can customize this behavior by setting `autocomplete.renderItem` to a function that receives `li, suggestion` parameters. The `li` is a DOM element and the `suggestion` is its data object.
+>
+> ### `renderCategory`
+>
+> By default, categories are rendered using just their `data.title`. You can customize this behavior by setting `autocomplete.renderCategory` to a function that receives `div, data` parameters. The `div` is a DOM element and the `data` is the full category data object, including the `list` of suggestions. After you customize the `div`, the list of suggestions for the category will be appended to `div`.
 
 ## `convertOnBlur`
 
