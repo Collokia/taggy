@@ -98,18 +98,21 @@ Expects an object that defines how the autocomplete list is configured. Autocomp
 >
 > ### `suggestions`
 >
-> A `suggestions(data)` should be set to a function that returns a promise. The promise should fulfill to an array of autocomplete suggestion objects for the provided `data.query`.
+> A `suggestions(data)` should be set to a function that returns a promise. The promise should fulfill to an array of autocomplete suggestion objects for the provided `data.input`.
 >
-> - `data.query` is a query for which suggestions should be provided
+> - `data.input` is a query for which suggestions should be provided
 > - `data.limit` is the previously specified `options.limit`
+> - `data.values` are the currently selected values
+> - `data.previousSelection` is the last suggestion selected by the user
+> - `data.previousSuggestions` is the last list of suggestions provided to the user
 >
 > ### `blankSearch`
 >
-> When this option is set to `true`, the `suggestions(data)` function will be called even when the `query` string is empty.
+> When this option is set to `true`, the `suggestions(data)` function will be called even when the `input` string is empty.
 >
 > ### `noMatches`
 >
-> Defaults to `null`. Set to a string if you want to display an informational message when no suggestions match the provided `query` string. Note that this message won't be displayed when `query` is empty even if `blankSearch` is turned on.
+> Defaults to `null`. Set to a string if you want to display an informational message when no suggestions match the provided `input` string. Note that this message won't be displayed when `input` is empty even if `blankSearch` is turned on.
 >
 > ### `debounce`
 >

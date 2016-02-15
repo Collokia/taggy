@@ -58,6 +58,9 @@ module.exports = function taggy (el, options) {
   const before = dom('span', 'tay-tags tay-tags-before');
   const after = dom('span', 'tay-tags tay-tags-after');
   const parent = el.parentElement;
+  let previousSuggestions = [];
+  let previousSelection = null;
+
   el.className += ' tay-input';
   parent.className += ' tay-editor';
   parent.insertBefore(before, el);
@@ -205,6 +208,7 @@ module.exports = function taggy (el, options) {
       debounce: config.debounce,
       set (s) {
         el.value = '';
+        previousSelection = s;
         addItem(s);
       },
       filter (q, suggestion) {
@@ -225,7 +229,7 @@ module.exports = function taggy (el, options) {
       return data.query.length;
     }
     function suggestions (data, done) {
-      const {query} = data;
+      const {query, limit} = data;
       if (!config.blankSearch && query.length === 0) {
         done([]); return;
       }
@@ -239,18 +243,25 @@ module.exports = function taggy (el, options) {
           const diff = duration * 1000;
           const fresh = new Date(start + diff) > new Date();
           if (fresh) {
-            done(entry.items); return;
+            done(entry.items.slice()); return;
           }
         }
       }
       config
-        .suggestions(data)
+        .suggestions({
+          previousSuggestions: previousSuggestions.slice(),
+          previousSelection,
+          values: readValue(),
+          input: query,
+          limit
+        })
         .then(result => {
           const items = Array.isArray(result) ? result : [];
           if (caching) {
             cache[hash] = { created: new Date(), items };
           }
-          done(items);
+          previousSuggestions = items;
+          done(items.slice());
         })
         .catch(error => {
           console.log('Autocomplete suggestions promise rejected', error, el);
