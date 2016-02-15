@@ -498,4 +498,4 @@ module.exports = function taggy (el, options) {
   function defaultValidate (value) {
     return findItem(value) === null;
   }
-}
+};

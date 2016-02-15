@@ -6,4 +6,4 @@ export default function dom (tagName, classes) {
     el.className = classes;
   }
   return el;
-};
+}

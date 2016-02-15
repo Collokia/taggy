@@ -78,4 +78,4 @@ export default function factory (el) {
     }
     return el.currentStyle;
   }
-};
+}

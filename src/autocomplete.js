@@ -18,7 +18,7 @@ export default function autocomplete (el, options) {
   const o = options || {};
   const parent = o.appendTo || doc.body;
   const render = o.render || defaultRenderer;
-  const {getText, getValue, form, suggestions, noMatches, noMatchesText, highlighter=true} = o;
+  const {getText, getValue, form, suggestions, noMatches, noMatchesText, highlighter=true, highlightCompleteWords=true} = o;
   const limit = typeof o.limit === 'number' ? o.limit : Infinity;
   const userFilter = o.filter || defaultFilter;
   const userSet = o.set || defaultSetter;
@@ -211,22 +211,77 @@ export default function autocomplete (el, options) {
   }
 
   function highlight (el, needle) {
-    const chars = [...el.querySelectorAll('.tac-char')];
+    const rword = /[\s,._\[\]{}()-]/g;
+    const words = needle.split(rword).filter(w => w.length);
+    const elems = [...el.querySelectorAll('.tac-char')];
+    let chars;
+    let startIndex = 0;
 
-    for (let input of needle) {
-      while (chars.length) {
-        let char = chars.shift();
-        let charText = char.innerText || char.textContent;
-        if (charText === input) {
-          on(char);
+    balance();
+    if (highlightCompleteWords) {
+      whole();
+    }
+    fuzzy();
+    clearRemainder();
+
+    function balance () {
+      chars = elems.map(el => el.innerText || el.textContent);
+    }
+
+    function whole () {
+      for (let word of words) {
+        let tempIndex = startIndex;
+        retry: while (tempIndex !== -1) {
+          let init = true;
+          let prevIndex = tempIndex;
+          for (let char of word) {
+            const i = findIndex(char, prevIndex + 1);
+            const fail = i === -1 || (!init && prevIndex + 1 !== i);
+            if (init) {
+              init = false;
+              tempIndex = i;
+            }
+            if (fail) {
+              continue retry;
+            }
+            prevIndex = i;
+          }
+          for (let el of elems.splice(tempIndex, 1 + prevIndex - tempIndex)) {
+            on(el);
+          }
+          balance();
+          needle = needle.replace(word, '');
           break;
-        } else {
-          off(char);
         }
       }
     }
-    while (chars.length) {
-      off(chars.shift());
+
+    function fuzzy () {
+      for (let input of needle) {
+        while (elems.length) {
+          let el = elems.shift();
+          if ((el.innerText || el.textContent) === input) {
+            on(el);
+            break;
+          } else {
+            off(el);
+          }
+        }
+      }
+    }
+
+    function findIndex (input, startIndex) {
+      const i = chars.slice(startIndex).indexOf(input);
+      if (i === -1) {
+        return -1;
+      }
+      return i + startIndex;
+    }
+
+    function clearRemainder () {
+      while (elems.length) {
+        off(elems.shift());
+      }
     }
 
     function on (ch) {

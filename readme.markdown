@@ -122,6 +122,10 @@ Expects an object that defines how the autocomplete list is configured. Autocomp
 >
 > If set to `false`, autocomplete suggestions won't be highlighted based on user input.
 >
+> ### `highlightCompleteWords`
+>
+> If set to `false`, autocomplete suggestions won't be highlighted as whole words first. The highlighter will be faster but the UX won't be as close to user expectations.
+>
 
 ## `convertOnBlur`
 
