@@ -148,7 +148,7 @@ export default function autocomplete (el, options) {
     return li;
 
     function hoverSuggestion () {
-      select(suggestion);
+      select(li);
     }
 
     function clickedSuggestion () {
@@ -288,10 +288,10 @@ export default function autocomplete (el, options) {
     }
   }
 
-  function select (suggestion) {
+  function select (li) {
     unselect();
-    if (suggestion) {
-      selection = suggestion;
+    if (li) {
+      selection = li;
       selection.className += ' tac-selected';
     }
   }
@@ -314,11 +314,11 @@ export default function autocomplete (el, options) {
     }
     const first = up ? 'lastChild' : 'firstChild';
     const next = up ? 'previousSibling' : 'nextSibling';
-    const suggestion = selection && selection[next] || ul[first];
+    const li = selection && selection[next] || ul[first];
 
-    select(suggestion);
+    select(li);
 
-    if (hidden(suggestion)) {
+    if (hidden(li)) {
       move(up, moves ? moves + 1 : 1);
     }
   }

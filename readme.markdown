@@ -94,7 +94,7 @@ Expects an object that defines how the autocomplete list is configured. Autocomp
 >
 > ### `duplicates`
 >
-> Specifies whether the autocomplete list should show tags that are already selected.
+> Specifies whether the autocomplete should suggest tags that are already selected.
 >
 > ### `suggestions`
 >

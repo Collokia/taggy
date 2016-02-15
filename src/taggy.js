@@ -90,9 +90,13 @@ module.exports = function taggy (el, options) {
 
   return api;
 
-  function findItem (value, prop) {
+  function findItem (value, prop='data') {
+    const comp = (prop === 'data' ?
+      item => getValue(item[prop]) === getValue(value) :
+      item => item[prop] === value
+    );
     for (let i = 0; i < currentValues.length; i++) {
-      if (currentValues[i][prop || 'data'] === value) {
+      if (comp(currentValues[i])) {
         return currentValues[i];
       }
     }
@@ -212,7 +216,7 @@ module.exports = function taggy (el, options) {
         addItem(s);
       },
       filter (q, suggestion) {
-        if (config.duplicates !== false && findItem(suggestion)) {
+        if (config.duplicates !== true && findItem(suggestion)) {
           return false;
         }
         if (config.filter) {
