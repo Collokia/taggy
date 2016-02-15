@@ -13,6 +13,7 @@ void function () {
         suggestions: function (data) {
           return Promise.resolve([
             { tagId: 'dev:android', descriptionText: 'atmosphere-scala-world', taxonomy: 'devWorld' },
+            { tagId: 'dev:android', descriptionText: 'atmosphere-scala-wow-saw', taxonomy: 'devWorld' },
             { tagId: 'dev:android', descriptionText: 'atmosphere-scala-chat', taxonomy: 'devWorld' },
             { tagId: 'dev:android', descriptionText: 'dev-android', taxonomy: 'devWorld' },
             { tagId: 'dev:java', descriptionText: 'dev-java', taxonomy: 'langs' },

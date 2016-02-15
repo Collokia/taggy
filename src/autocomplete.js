@@ -235,7 +235,7 @@ export default function autocomplete (el, options) {
           let init = true;
           let prevIndex = tempIndex;
           for (let char of word) {
-            const i = findIndex(char, prevIndex + 1);
+            const i = chars.indexOf(char, prevIndex + 1);
             const fail = i === -1 || (!init && prevIndex + 1 !== i);
             if (init) {
               init = false;
@@ -268,14 +268,6 @@ export default function autocomplete (el, options) {
           }
         }
       }
-    }
-
-    function findIndex (input, startIndex) {
-      const i = chars.slice(startIndex).indexOf(input);
-      if (i === -1) {
-        return -1;
-      }
-      return i + startIndex;
     }
 
     function clearRemainder () {
