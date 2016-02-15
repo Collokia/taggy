@@ -18,7 +18,7 @@ export default function autocomplete (el, options) {
   const o = options || {};
   const parent = o.appendTo || doc.body;
   const render = o.render || defaultRenderer;
-  const {getText, getValue, form, suggestions, noMatches, noMatchesText} = o;
+  const {getText, getValue, form, suggestions, noMatches, noMatchesText, highlighter=true} = o;
   const limit = typeof o.limit === 'number' ? o.limit : Infinity;
   const userFilter = o.filter || defaultFilter;
   const userSet = o.set || defaultSetter;
@@ -138,7 +138,9 @@ export default function autocomplete (el, options) {
   function add (suggestion) {
     const li = tag('li', 'tac-item');
     render(li, suggestion);
-    breakupForHighlighter(li);
+    if (highlighter) {
+      breakupForHighlighter(li);
+    }
     crossvent.add(li, 'mouseenter', hoverSuggestion);
     crossvent.add(li, 'click', clickedSuggestion);
     crossvent.add(li, 'autocomplete-filter', filterItem);
@@ -392,7 +394,9 @@ export default function autocomplete (el, options) {
         crossvent.fabricate(li, 'autocomplete-filter');
         if (li.className.indexOf('tac-hide') === -1) {
           count++;
-          highlight(li, value);
+          if (highlighter) {
+            highlight(li, value);
+          }
         }
       }
       li = li.nextSibling;

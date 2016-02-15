@@ -117,6 +117,11 @@ Expects an object that defines how the autocomplete list is configured. Autocomp
 > ### `debounce`
 >
 > The minimum amount of milliseconds that should ellapse between two different calls to `suggestions`. Useful to allow users to type text without firing dozens of queries. Defaults to `300`.
+>
+> ### `highlighter`
+>
+> If set to `false`, autocomplete suggestions won't be highlighted based on user input.
+>
 
 ## `convertOnBlur`
 
