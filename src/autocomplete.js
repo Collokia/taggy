@@ -18,7 +18,7 @@ const docElement = doc.documentElement;
 export default function autocomplete (el, options) {
   const o = options || {};
   const parent = o.appendTo || doc.body;
-  const render = o.render || defaultRenderer;
+  const {renderItem=defaultItemRenderer, renderCategory=defaultCategoryRenderer} = {o};
   const {getText, getValue, form, suggestions, noMatches, noMatchesText, highlighter=true, highlightCompleteWords=true} = o;
   const limit = typeof o.limit === 'number' ? o.limit : Infinity;
   const userFilter = o.filter || defaultFilter;
@@ -62,7 +62,8 @@ export default function autocomplete (el, options) {
     filterAnchoredHTML,
     defaultAppendText: appendText,
     defaultFilter,
-    defaultRenderer,
+    defaultItemRenderer,
+    defaultCategoryRenderer,
     defaultSetter,
     retarget,
     attachment,
@@ -138,16 +139,17 @@ export default function autocomplete (el, options) {
   }
 
   function getCategory (data) {
-    if (!data.name) {
-      data.name = 'default';
+    if (!data.title) {
+      data.title = 'default';
     }
-    if (!categoryMap[data.name]) {
-      categoryMap[data.name] = createCategory();
+    if (!categoryMap[data.title]) {
+      categoryMap[data.title] = createCategory();
     }
-    return categoryMap[data.name];
+    return categoryMap[data.title];
     function createCategory () {
       const category = tag('div', 'tac-category');
       const ul = tag('ul', 'tac-list');
+      renderCategory(category, data);
       category.appendChild(ul);
       categories.appendChild(category);
       return { data, ul };
@@ -157,7 +159,7 @@ export default function autocomplete (el, options) {
   function add (suggestion, categoryData) {
     const cat = getCategory(categoryData);
     const li = tag('li', 'tac-item');
-    render(li, suggestion);
+    renderItem(li, suggestion);
     if (highlighter) {
       breakupForHighlighter(li);
     }
@@ -493,7 +495,14 @@ export default function autocomplete (el, options) {
       let category = categories.firstChild;
       let count = 0;
       while (category) {
-        count += walkCategory(findList(category));
+        const list = findList(category);
+        const partial = walkCategory(list);
+        if (partial === 0) {
+          category.classList.add('tac-hide');
+        } else {
+          category.classList.remove('tac-hide');
+        }
+        count += partial;
         category = category.nextSibling;
       }
       return count;
@@ -605,8 +614,16 @@ export default function autocomplete (el, options) {
     }
   }
 
-  function defaultRenderer (li, suggestion) {
+  function defaultItemRenderer (li, suggestion) {
     text(li, getText(suggestion));
+  }
+
+  function defaultCategoryRenderer (div, data) {
+    if (data.title !== 'default') {
+      const title = tag('div', 'tac-category-title');
+      div.appendChild(title);
+      text(title, data.title);
+    }
   }
 
   function defaultFilter (q, suggestion) {

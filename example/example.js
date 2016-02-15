@@ -12,19 +12,19 @@ void function () {
         noMatches: 'No results found.',
         suggestions: function (data) {
           return Promise.resolve([{
-            name: 'scala',
+            title: 'scala',
             list: [
               { tagId: 'dev:scala', descriptionText: 'atmosphere-scala-world', taxonomy: 'devWorld' },
               { tagId: 'dev:scala-wow', descriptionText: 'atmosphere-scala-wow-saw', taxonomy: 'devWorld' },
               { tagId: 'dev:scala-chat', descriptionText: 'atmosphere-scala-chat', taxonomy: 'devWorld' }
             ]
           }, {
-            name: 'mobile',
+            title: 'mobile',
             list: [
               { tagId: 'dev:android', descriptionText: 'dev-android', taxonomy: 'devWorld' }
             ]
           }, {
-            name: 'java',
+            title: 'java',
             list: [
               { tagId: 'dev:java', descriptionText: 'dev-java', taxonomy: 'langs' },
               { tagId: 'dev:jvm', descriptionText: 'dev-jvm', taxonomy: 'other' }

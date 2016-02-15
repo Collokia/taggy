@@ -193,10 +193,8 @@ module.exports = function taggy (el, options) {
 
   function createAutocomplete () {
     const config = o.autocomplete;
-    const predictNextSearch = config.predictNextSearch;
+    const {suggestions: source, cache={}, predictNextSearch, renderItem, renderCategory} = config;
     const caching = config.cache !== false;
-    const cache = config.cache || {};
-    const source = config.suggestions;
     if (!source) {
       return;
     }
@@ -257,6 +255,8 @@ module.exports = function taggy (el, options) {
           previousSelection,
           values: readValue(),
           input: query,
+          renderItem,
+          renderCategory,
           limit
         })
         .then(result => {
