@@ -1,6 +1,7 @@
 'use strict';
 
 import sell from 'sell';
+import sektor from 'sektor';
 import bullseye from 'bullseye';
 import crossvent from 'crossvent';
 import fuzzysearch from 'fuzzysearch';
@@ -22,10 +23,11 @@ export default function autocomplete (el, options) {
   const limit = typeof o.limit === 'number' ? o.limit : Infinity;
   const userFilter = o.filter || defaultFilter;
   const userSet = o.set || defaultSetter;
-  const ul = tag('ul', 'tac-list');
+  const categories = tag('div', 'tac-categories');
   const container = tag('div', 'tac-container');
   const deferredFiltering = defer(filtering);
   const state = { counter: 0, query: null };
+  let categoryMap = Object.create(null);
   let selection = null;
   let eye;
   let attachment = el;
@@ -47,7 +49,6 @@ export default function autocomplete (el, options) {
   }
 
   const api = {
-    add,
     anchor: o.anchor,
     clear,
     show,
@@ -69,7 +70,7 @@ export default function autocomplete (el, options) {
   };
 
   retarget(el);
-  container.appendChild(ul);
+  container.appendChild(categories);
   if (noMatches && noMatchesText) {
     noneMatch = tag('div', 'tac-empty tac-hide');
     text(noneMatch, noMatchesText);
@@ -114,10 +115,10 @@ export default function autocomplete (el, options) {
     }
   }
 
-  function loaded (suggestions, forceShow) {
+  function loaded (categories, forceShow) {
     clear();
     api.suggestions = [];
-    suggestions.forEach(add);
+    categories.forEach(cat => cat.list.forEach(suggestion => add(suggestion, cat)));
     if (forceShow) {
       show();
     }
@@ -126,16 +127,35 @@ export default function autocomplete (el, options) {
 
   function clear () {
     unselect();
-    while (ul.lastChild) {
-      ul.removeChild(ul.lastChild);
+    while (categories.lastChild) {
+      categories.removeChild(categories.lastChild);
     }
+    categoryMap = Object.create(null);
   }
 
   function readInput () {
     return (textInput ? el.value : el.innerHTML).trim();
   }
 
-  function add (suggestion) {
+  function getCategory (data) {
+    if (!data.name) {
+      data.name = 'default';
+    }
+    if (!categoryMap[data.name]) {
+      categoryMap[data.name] = createCategory();
+    }
+    return categoryMap[data.name];
+    function createCategory () {
+      const category = tag('div', 'tac-category');
+      const ul = tag('ul', 'tac-list');
+      category.appendChild(ul);
+      categories.appendChild(category);
+      return { data, ul };
+    }
+  }
+
+  function add (suggestion, categoryData) {
+    const cat = getCategory(categoryData);
     const li = tag('li', 'tac-item');
     render(li, suggestion);
     if (highlighter) {
@@ -145,7 +165,7 @@ export default function autocomplete (el, options) {
     crossvent.add(li, 'click', clickedSuggestion);
     crossvent.add(li, 'autocomplete-filter', filterItem);
     crossvent.add(li, 'autocomplete-hide', hideItem);
-    ul.appendChild(li);
+    cat.ul.appendChild(li);
     api.suggestions.push(suggestion);
     return li;
 
@@ -353,22 +373,46 @@ export default function autocomplete (el, options) {
   }
 
   function move (up, moves) {
-    const total = ul.children.length;
-    if (total < moves) {
-      unselect();
-      return;
-    }
+    const total = api.suggestions.length;
     if (total === 0) {
       return;
     }
+    if (moves > total) {
+      unselect();
+      return;
+    }
+    const cat = findCategory(selection) || categories.firstChild;
     const first = up ? 'lastChild' : 'firstChild';
+    const last = up ? 'firstChild' : 'lastChild';
     const next = up ? 'previousSibling' : 'nextSibling';
-    const li = selection && selection[next] || ul[first];
-
+    const prev = up ? 'nextSibling' : 'previousSibling';
+    const li = findNext();
     select(li);
 
     if (hidden(li)) {
       move(up, moves ? moves + 1 : 1);
+    }
+
+    function findCategory (el) {
+      while (el) {
+        if (sektor.matchesSelector(el.parentElement, '.tac-category')) {
+          return el.parentElement;
+        }
+        el = el.parentElement;
+      }
+      return null;
+    }
+
+    function findNext () {
+      if (selection) {
+        if (selection[next]) {
+          return selection[next];
+        }
+        if (cat[next] && findList(cat[next])[first]) {
+          return findList(cat[next])[first];
+        }
+      }
+      return findList(categories[first])[first];
     }
   }
 
@@ -432,23 +476,8 @@ export default function autocomplete (el, options) {
     debouncedLoading(true);
     crossvent.fabricate(attachment, 'autocomplete-filter');
     const value = readInput();
-    let li = ul.firstChild;
-    let count = 0;
-    while (li) {
-      if (count >= limit) {
-        crossvent.fabricate(li, 'autocomplete-hide');
-      } else {
-        crossvent.fabricate(li, 'autocomplete-filter');
-        if (li.className.indexOf('tac-hide') === -1) {
-          count++;
-          if (highlighter) {
-            highlight(li, value);
-          }
-        }
-      }
-      li = li.nextSibling;
-    }
     const nomatch = noMatches({ query: value });
+    let count = walkCategories();
     if (count === 0 && nomatch) {
       noneMatch.classList.remove('tac-hide');
     } else {
@@ -459,6 +488,34 @@ export default function autocomplete (el, options) {
     }
     if (!selection && !nomatch) {
       hide();
+    }
+    function walkCategories () {
+      let category = categories.firstChild;
+      let count = 0;
+      while (category) {
+        count += walkCategory(findList(category));
+        category = category.nextSibling;
+      }
+      return count;
+    }
+    function walkCategory (ul) {
+      let li = ul.firstChild;
+      let count = 0;
+      while (li) {
+        if (count >= limit) {
+          crossvent.fabricate(li, 'autocomplete-hide');
+        } else {
+          crossvent.fabricate(li, 'autocomplete-filter');
+          if (li.className.indexOf('tac-hide') === -1) {
+            count++;
+            if (highlighter) {
+              highlight(li, value);
+            }
+          }
+        }
+        li = li.nextSibling;
+      }
+      return count;
     }
   }
 
@@ -607,6 +664,8 @@ export default function autocomplete (el, options) {
   function appendHTML () {
     throw new Error('Anchoring in editable elements is disabled by default.');
   }
+
+  function findList (category) { return sektor('.tac-list', category)[0]; }
 }
 
 function isInput (el) { return el.tagName === 'INPUT' || el.tagName === 'TEXTAREA'; }

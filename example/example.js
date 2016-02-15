@@ -11,14 +11,25 @@ void function () {
       autocomplete: {
         noMatches: 'No results found.',
         suggestions: function (data) {
-          return Promise.resolve([
-            { tagId: 'dev:android', descriptionText: 'atmosphere-scala-world', taxonomy: 'devWorld' },
-            { tagId: 'dev:android', descriptionText: 'atmosphere-scala-wow-saw', taxonomy: 'devWorld' },
-            { tagId: 'dev:android', descriptionText: 'atmosphere-scala-chat', taxonomy: 'devWorld' },
-            { tagId: 'dev:android', descriptionText: 'dev-android', taxonomy: 'devWorld' },
-            { tagId: 'dev:java', descriptionText: 'dev-java', taxonomy: 'langs' },
-            { tagId: 'dev:jvm', descriptionText: 'dev-jvm', taxonomy: 'other' }
-          ]);
+          return Promise.resolve([{
+            name: 'scala',
+            list: [
+              { tagId: 'dev:scala', descriptionText: 'atmosphere-scala-world', taxonomy: 'devWorld' },
+              { tagId: 'dev:scala-wow', descriptionText: 'atmosphere-scala-wow-saw', taxonomy: 'devWorld' },
+              { tagId: 'dev:scala-chat', descriptionText: 'atmosphere-scala-chat', taxonomy: 'devWorld' }
+            ]
+          }, {
+            name: 'mobile',
+            list: [
+              { tagId: 'dev:android', descriptionText: 'dev-android', taxonomy: 'devWorld' }
+            ]
+          }, {
+            name: 'java',
+            list: [
+              { tagId: 'dev:java', descriptionText: 'dev-java', taxonomy: 'langs' },
+              { tagId: 'dev:jvm', descriptionText: 'dev-jvm', taxonomy: 'other' }
+            ]
+          }]);
         },
         predictNextSearch (o) {
           return 'dev-';
@@ -35,9 +46,11 @@ void function () {
         suggestions: function (data) {
           return new Promise((resolve, reject) => {
             setTimeout(function () {
-              resolve([
-                'apples', 'bananas', 'carrots', 'peanuts', 'lettuce'
-              ])
+              resolve([{
+                list: [
+                  'apples', 'bananas', 'carrots', 'peanuts', 'lettuce'
+                ]
+              }]);
             }, 500);
           });
         }
@@ -48,10 +61,10 @@ void function () {
       autocomplete: {
         noMatches: 'No results found.',
         suggestions: function (data) {
-          return Promise.resolve(Array
+          return Promise.resolve([{ list: Array
             .apply(null, { length: 10 })
             .map(x => Math.random().toString().slice(2))
-          );
+          }]);
         }
       }
     }),
