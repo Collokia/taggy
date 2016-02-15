@@ -78,9 +78,11 @@
 .tac-category-title {
   background-color: #eee;
   color: #aaa;
-  padding: 7px;
   text-align: right;
   text-transform: capitalize;
   font-style: italic;
   font-size: 12px;
+  -webkit-box-shadow: 1px 0px 1px;
+  box-shadow: 1px 0px 1px;
+  padding: 7px;
 }
