@@ -156,7 +156,11 @@ export default function autocomplete (el, options) {
       set(suggestion);
       hide();
       attachment.focus();
-      lastPrefix = o.prefix && o.prefix(input, api.suggestions.slice()) || '';
+      lastPrefix = o.predictNextSearch && o.predictNextSearch({
+        input: input,
+        suggestions: api.suggestions.slice(),
+        selection: suggestion
+      }) || '';
       if (lastPrefix) {
         el.value = lastPrefix;
         el.select();

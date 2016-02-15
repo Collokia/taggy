@@ -186,7 +186,7 @@ module.exports = function taggy (el, options) {
 
   function createAutocomplete () {
     const config = o.autocomplete;
-    const prefix = config.prefix;
+    const predictNextSearch = config.predictNextSearch;
     const caching = config.cache !== false;
     const cache = config.cache || {};
     const source = config.suggestions;
@@ -199,7 +199,7 @@ module.exports = function taggy (el, options) {
       limit,
       getText,
       getValue,
-      prefix,
+      predictNextSearch,
       noMatches,
       noMatchesText: config.noMatches,
       debounce: config.debounce,

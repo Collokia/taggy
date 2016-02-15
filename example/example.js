@@ -17,7 +17,7 @@ void function () {
             { tagId: 'dev:jvm', descriptionText: 'dev-jvm', taxonomy: 'other' }
           ]);
         },
-        prefix (fullText) {
+        predictNextSearch (o) {
           return 'dev-';
         }
       },
