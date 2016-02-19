@@ -41,5 +41,22 @@
     "stylus": "0.53.0",
     "uglify-js": "2.6.1",
     "watchify": "3.7.0"
+  },
+  "jspm": {
+    "directories": {
+      "lib": "dist"
+    },
+    "dependencies": {
+      "bullseye": "npm:bullseye@1.4.6",
+      "contra": "npm:contra@1.9.1",
+      "crossvent": "npm:crossvent@1.5.4",
+      "fuzzysearch": "npm:fuzzysearch@1.0.3",
+      "hash-sum": "npm:hash-sum@1.0.2",
+      "horsey": "npm:horsey@3.0.0",
+      "lodash": "npm:lodash@4.1.0",
+      "sektor": "npm:sektor@1.1.4",
+      "sell": "npm:sell@1.0.0"
+    },
+    "devDependencies": {}
   }
 }
