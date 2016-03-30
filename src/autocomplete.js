@@ -346,9 +346,9 @@ export default function autocomplete (el, options) {
   function hidden (li) { return li.className.indexOf('tac-hide') !== -1; }
 
   function show () {
+    eye.refresh();
     if (!visible()) {
       container.className += ' tac-show';
-      eye.refresh();
       crossvent.fabricate(attachment, 'autocomplete-show');
     }
   }
