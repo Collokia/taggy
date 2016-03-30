@@ -207,6 +207,7 @@ module.exports = function taggy (el, options) {
       predictNextSearch,
       noMatches,
       noMatchesText: config.noMatches,
+      blankSearch: config.blankSearch,
       debounce: config.debounce,
       set (s) {
         el.value = '';

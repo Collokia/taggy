@@ -496,6 +496,9 @@ export default function autocomplete (el, options) {
     debouncedLoading(true);
     crossvent.fabricate(attachment, 'autocomplete-filter');
     const value = readInput();
+    if (!o.blankSearch && !value) {
+      hide(); return;
+    }
     const nomatch = noMatches({ query: value });
     let count = walkCategories();
     if (count === 0 && nomatch && hasItems) {
