@@ -48,6 +48,7 @@ export default function autocomplete (el, options) {
     ranchorright = new RegExp(o.anchor + '$');
   }
 
+  let hasItems = false;
   const api = {
     anchor: o.anchor,
     clear,
@@ -99,25 +100,33 @@ export default function autocomplete (el, options) {
   }
 
   function loading (forceShow) {
-    if (typeof suggestions === 'function') {
-      crossvent.remove(attachment, 'focus', loading);
-      const query = readInput();
-      if (query !== state.query) {
-        state.counter++;
-        state.query = query;
-
-        const counter = state.counter;
-        suggestions({ query, limit }, function (s) {
-          if (state.counter === counter) {
-            loaded(s, forceShow);
-          }
-        });
-      }
+    if (typeof suggestions !== 'function') {
+      return;
     }
+    crossvent.remove(attachment, 'focus', loading);
+    const query = readInput();
+    if (query === state.query) {
+      return;
+    }
+    hasItems = false;
+    state.query = query;
+
+    const counter = ++state.counter;
+
+    suggestions({ query, limit }, function (err, result, blankQuery) {
+      if (state.counter !== counter) {
+        return;
+      }
+      loaded(result, forceShow);
+      if (err || blankQuery) {
+        hasItems = false;
+      }
+    });
   }
 
   function loaded (categories, forceShow) {
     clear();
+    hasItems = true;
     api.suggestions = [];
     categories.forEach(cat => cat.list.forEach(suggestion => add(suggestion, cat)));
     if (forceShow) {
@@ -132,6 +141,7 @@ export default function autocomplete (el, options) {
       categories.removeChild(categories.lastChild);
     }
     categoryMap = Object.create(null);
+    hasItems = false;
   }
 
   function readInput () {
@@ -471,6 +481,14 @@ export default function autocomplete (el, options) {
     e.preventDefault();
   }
 
+  function showNoResults () {
+    noneMatch.classList.remove('tac-hide');
+  }
+
+  function hideNoResults () {
+    noneMatch.classList.add('tac-hide');
+  }
+
   function filtering () {
     if (!visible()) {
       return;
@@ -480,10 +498,10 @@ export default function autocomplete (el, options) {
     const value = readInput();
     const nomatch = noMatches({ query: value });
     let count = walkCategories();
-    if (count === 0 && nomatch) {
-      noneMatch.classList.remove('tac-hide');
+    if (count === 0 && nomatch && hasItems) {
+      showNoResults();
     } else {
-      noneMatch.classList.add('tac-hide');
+      hideNoResults();
     }
     if (!selection) {
       move();

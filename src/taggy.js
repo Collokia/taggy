@@ -233,7 +233,7 @@ module.exports = function taggy (el, options) {
     function suggestions (data, done) {
       const {query, limit} = data;
       if (!config.blankSearch && query.length === 0) {
-        done([]); return;
+        done(null, [], true); return;
       }
       api.emit('autocomplete.beforeUpdate');
       const hash = sum(query); // fast, case insensitive, prevents collisions
@@ -245,7 +245,7 @@ module.exports = function taggy (el, options) {
           const diff = duration * 1000;
           const fresh = new Date(start + diff) > new Date();
           if (fresh) {
-            done(entry.items.slice()); return;
+            done(null, entry.items.slice()); return;
           }
         }
       }
@@ -265,11 +265,11 @@ module.exports = function taggy (el, options) {
             cache[hash] = { created: new Date(), items };
           }
           previousSuggestions = items;
-          done(items.slice());
+          done(null, items.slice());
         })
         .catch(error => {
           console.log('Autocomplete suggestions promise rejected', error, el);
-          done([]);
+          done(error, []);
         });
     }
   }
