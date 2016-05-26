@@ -332,8 +332,8 @@ module.exports = function taggy (el, options) {
   function click (e) {
     const target = e.target;
     if (tagRemovalClass.test(target.className)) {
-      focusTag(target.parentElement, { start: 'end', end: 'end', remove: true });
-      shift();
+      removeItemByElement(target.parentElement);
+      el.focus();
       return;
     }
     let top = target;

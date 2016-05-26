@@ -37,7 +37,8 @@ void function () {
       },
       parseText: 'descriptionText',
       parseValue: 'descriptionText',
-      free: false
+      free: false,
+      deletion: true
     }),
 
     taggy($('#sourced'), {
