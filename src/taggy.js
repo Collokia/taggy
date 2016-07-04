@@ -71,10 +71,12 @@ module.exports = function taggy (el, options) {
   const api = emitter({
     addItem,
     findItem: data => findItem(data),
+    findItemIndex: data => findItemIndex(data),
     findItemByElement: el => findItem(el, 'el'),
     removeItem: removeItemByData,
     removeItemByElement,
-    value: readValue,
+    value: readValue, 
+    allValues: readValueAll,
     destroy
   });
 
@@ -103,10 +105,23 @@ module.exports = function taggy (el, options) {
     return null;
   }
 
+  function findItemIndex (value, prop='data') {
+    const comp = (prop === 'data' ?
+      item => getValue(item[prop]) === getValue(value) :
+      item => item[prop] === value
+    );
+    for (let i = 0; i < currentValues.length; i++) {
+      if (comp(currentValues[i])) {
+        return i;
+      }
+    }
+    return null;
+  }
+
   function addItem (data) {
     const valid = validate(data);
     const item = { data, valid };
-    if (o.preventInvalid) {
+    if (o.preventInvalid && !valid) {
       return api;
     }
     const el = renderItem(item);
@@ -135,7 +150,7 @@ module.exports = function taggy (el, options) {
     currentValues.slice().forEach((v,i) => {
       currentValues.splice(i, 1);
 
-      const valid = validate(v.data);
+      const valid = validate(v.data, i);
       if (valid) {
         v.el.classList.add('tay-valid');
         v.el.classList.remove('tay-invalid');
@@ -191,6 +206,11 @@ module.exports = function taggy (el, options) {
     return currentValues.filter(v => v.valid).map(v => v.data);
   }
 
+  function readValueAll () {
+    return currentValues.map(v => v.data);
+  }
+  
+  
   function createAutocomplete () {
     const config = o.autocomplete;
     const {suggestions: source, cache={}, predictNextSearch, renderItem, renderCategory} = config;
@@ -496,7 +516,8 @@ module.exports = function taggy (el, options) {
     [...container.children].forEach((tag, i) => fn(readTag(tag), tag, i));
   }
 
-  function defaultValidate (value) {
-    return findItem(value) === null;
+  function defaultValidate (value, i) {
+    const x =  findItemIndex(value);
+    return x === i || x === null ;
   }
 };
