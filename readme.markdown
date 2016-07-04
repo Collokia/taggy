@@ -62,7 +62,7 @@ A method that's called whenever a tag should be rendered. Defaults to setting `g
 
 When you have complex data items from autocomplete, you need to set `parseText` to read the value that should be used as a display value.
 
-## `parseText`
+## `parseValue`
 
 When you have complex data items from autocomplete, you need to set `parseText` to read the value that should be used as each tag's value.
 
@@ -165,6 +165,10 @@ Adds an item to the input. The `data` parameter could be a string or a complex o
 
 Finds an item by its `data` string or object.
 
+## `.findItemIndex(data)`
+
+Return the index of the first item found by its `data` string or object.
+
 ## `.findItemByElement(el)`
 
 Finds an item by its `.tay-tag` DOM element.
@@ -179,7 +183,11 @@ Removes an item from the input. The item is found using a `.tay-tag` DOM element
 
 ## `.value()`
 
-Returns the list of tags as an array.
+Returns the list of valid tags as an array.
+
+## `.allValues()`
+
+Returns the list of tags as an array including invalid tags.
 
 ## `.destroy()`
 
