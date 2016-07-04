@@ -80,7 +80,7 @@ module.exports = function taggy (el, options) {
     destroy
   });
 
-  const placeholder = el.getAttribute('placeholder') || "";
+  const placeholder = el.getAttribute('placeholder');
   let placeheld = true;
 
   bind();
