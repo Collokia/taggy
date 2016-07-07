@@ -433,7 +433,7 @@ module.exports = function taggy (el, options) {
 
   function keypress (e) {
     const key = e.which || e.keyCode || e.charCode;
-    if (String.fromCharCode(key) === delimiter) {
+    if (String.fromCharCode(key) === delimiter || key === 13 || key === 9) {
       convert();
       e.preventDefault();
       return false;
